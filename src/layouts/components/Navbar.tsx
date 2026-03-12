@@ -1,36 +1,67 @@
 import LogoMeta from "../../assets/logo-meta.png"
-import { BodyPartMuscleIcon, Calendar03Icon, SaveMoneyDollarIcon, Settings01Icon } from "@hugeicons/core-free-icons"
+import { BodyPartMuscleIcon, Calendar03Icon, SaveMoneyDollarIcon, Settings01Icon, Menu01Icon, Cancel01Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 
 export function Navbar() {
     const navigate = useNavigate()
+    const [menuOpen, setMenuOpen] = useState(false)
+
+    const navItems = [
+        { label: "Agendamentos", icon: Calendar03Icon, path: "/agendamentos" },
+        { label: "Academia", icon: BodyPartMuscleIcon, path: "/academia" },
+        { label: "Financeiro", icon: SaveMoneyDollarIcon, path: "/financeiro" },
+        { label: "Configurações", icon: Settings01Icon, path: "/configuracoes" },
+    ]
+
+    const handleNavigate = (path: string) => {
+        navigate(path)
+        setMenuOpen(false)
+    }
 
     return (
-        <header className="w-full bg-maingreen flex flex-row items-center px-12 py-2 text-white justify-between">
-            <img src={LogoMeta} alt="Logo Meta Centro Esportivo" className="h-14" />
+        <header className="w-full bg-maingreen text-white">
+            <div className="flex flex-row items-center px-6 md:px-12 py-2 justify-between">
+                <img src={LogoMeta} alt="Logo Meta Centro Esportivo" className="h-14" />
 
-            <div className="flex flex-row gap-8">
-                <button className="navbar-button" onClick={() => navigate("/agendamentos")}>
-                    <HugeiconsIcon icon={Calendar03Icon} />
-                    Agendamentos
-                </button>
+                {/* Desktop nav */}
+                <div className="hidden md:flex flex-row gap-8">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.path}
+                            className="navbar-button"
+                            onClick={() => handleNavigate(item.path)}
+                        >
+                            <HugeiconsIcon icon={item.icon} />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
 
-                <button className="navbar-button" onClick={() => navigate("/academia")}>
-                    <HugeiconsIcon icon={BodyPartMuscleIcon}/>
-                    Academia
-                </button>
-
-                <button className="navbar-button" onClick={() => navigate("/financeiro")}>
-                    <HugeiconsIcon icon={SaveMoneyDollarIcon} />
-                    Financeiro
-                </button>
-
-                <button className="navbar-button" onClick={() => navigate("/configuracoes")}>
-                    <HugeiconsIcon icon={Settings01Icon} />
-                    Configurações
+                <button
+                    className="md:hidden p-2 rounded-md hover:bg-white/10 transition-colors"
+                    onClick={() => setMenuOpen((prev) => !prev)}
+                    aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+                >
+                    <HugeiconsIcon icon={menuOpen ? Cancel01Icon : Menu01Icon} size={24} />
                 </button>
             </div>
+
+            {menuOpen && (
+                <div className="md:hidden flex flex-col px-6 pb-4 gap-2 border-t border-white/20">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.path}
+                            className="navbar-button justify-start w-full py-3"
+                            onClick={() => handleNavigate(item.path)}
+                        >
+                            <HugeiconsIcon icon={item.icon} />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            )}
         </header>
     )
 }

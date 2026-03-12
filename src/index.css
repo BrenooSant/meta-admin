@@ -2,7 +2,8 @@
 
 @import "tailwindcss";
 @plugin './hero.ts';
-@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@plugin "tailwind-scrollbar-hide";
+@source '../node_modules/@heroui/theme/dist';
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -10,8 +11,12 @@
     --font-montserrat: Montserrat, "sans-serif";
 
     --color-maingreen: #204820;
+    --color-secondarygreen: #608D60;
     --color-gradientblack: #181918;
     --color-lightblue: #EAF0F7;
+    --color-morning: #B0C400;
+    --color-afternoon: #FF6F00;
+    --color-night: #23379B;
 }
 
 @layer base {
@@ -27,5 +32,28 @@
 
   .gradient-background{
     @apply bg-linear-to-r from-gradientblack to-maingreen;
+  }
+
+  .button-g{
+    @apply bg-maingreen rounded-2xl p-3 text-white font-montserrat 
+    font-semibold cursor-pointer transition-all duration-300 
+    hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .confirm-button{
+    @apply bg-maingreen text-white font-semibold rounded-xl
+    px-3 py-2 text-sm cursor-pointer hover:bg-green-800 transition-colors 
+    duration-200;
+  }
+
+  .cancel-button{
+    @apply border border-red-600 text-red-600 font-semibold 
+    bg-none rounded-xl px-3 py-2 cursor-pointer hover:bg-red-100
+    text-sm transition-colors duration-200;
+  }
+
+  .card-day{
+    @apply w-fit rounded-2xl cursor-pointer transition-all 
+    duration-300 hover:-translate-y-1 hover:shadow-lg shrink-0 md:shrink;
   }
 }
