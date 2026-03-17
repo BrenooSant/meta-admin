@@ -17,6 +17,9 @@
     --color-morning: #B0C400;
     --color-afternoon: #FF6F00;
     --color-night: #23379B;
+    --color-activeuser: #10C60A;
+    --color-inativeuser: #FF0004;
+    --color-expireduser: #FF6F00;
 }
 
 @layer base {

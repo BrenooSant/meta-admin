@@ -6,15 +6,13 @@ import {
   ModalFooter,
   Input,
 } from "@heroui/react"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Calendar03Icon, ArrowDown01Icon } from "@hugeicons/core-free-icons"
 
 interface Props {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function ModalNovoAgendamento({ isOpen, onOpenChange }: Props) {
+export function ModalAddAluno({ isOpen, onOpenChange }: Props) {
   return (
     <Modal
       isOpen={isOpen}
@@ -29,10 +27,10 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange }: Props) {
         {(onClose) => (
           <>
             <ModalHeader className="flex justify-center gradient-background text-white">
-              Novo Agendamento
+              Adicionar Aluno
             </ModalHeader>
 
-            <ModalBody className="flex flex-col gap-y-3 mt-3">
+            <ModalBody className="flex gap-x-6 mt-4">
               <Input
                 placeholder="Nome Completo"
                 aria-label="Nome Completo"
@@ -56,11 +54,7 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange }: Props) {
               />
             </ModalBody>
 
-            <ModalFooter className="flex justify-center">
-              <button onClick={onClose} className="cancel-button">
-                Cancelar
-              </button>
-
+            <ModalFooter className="flex justify-end">
               <button className="confirm-button" onClick={onClose}>
                 Salvar
               </button>

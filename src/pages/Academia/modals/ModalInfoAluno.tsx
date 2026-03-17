@@ -6,20 +6,19 @@ import {
   ModalFooter,
   Input,
 } from "@heroui/react"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Calendar03Icon, ArrowDown01Icon } from "@hugeicons/core-free-icons"
 
 interface Props {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function ModalNovoAgendamento({ isOpen, onOpenChange }: Props) {
+export function ModalInfoAluno({ isOpen, onOpenChange }: Props) {
   return (
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       placement="center"
+      size="2xl"
       classNames={{
         wrapper: "px-4",
         closeButton: "text-white hover:bg-white/40 cursor-pointer p-1"
@@ -29,10 +28,10 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange }: Props) {
         {(onClose) => (
           <>
             <ModalHeader className="flex justify-center gradient-background text-white">
-              Novo Agendamento
+              Informações do Aluno
             </ModalHeader>
 
-            <ModalBody className="flex flex-col gap-y-3 mt-3">
+            <ModalBody className="grid lg:grid-cols-2 gap-x-6 mt-4">
               <Input
                 placeholder="Nome Completo"
                 aria-label="Nome Completo"
@@ -54,13 +53,33 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange }: Props) {
                   inputWrapper: "p-0",
                 }}
               />
+
+              <Input
+                placeholder="Data do Último Pagamento"
+                aria-label="Data do Último Pagamento"
+                disabled
+                type="text"
+                classNames={{
+                  innerWrapper: "flex items-center gap-2 bg-gray-200 py-3 px-4 rounded-xl",
+                  input: "text-sm focus:outline-none border-transparent focus:border-transparent focus:ring-0",
+                  inputWrapper: "p-0",
+                }}
+              />
+
+              <Input
+                placeholder="Data de Vencimento"
+                aria-label="Data de Vencimento"
+                disabled
+                type="text"
+                classNames={{
+                  innerWrapper: "flex items-center gap-2 bg-gray-200 py-3 px-4 rounded-xl",
+                  input: "text-sm focus:outline-none border-transparent focus:border-transparent focus:ring-0",
+                  inputWrapper: "p-0",
+                }}
+              />
             </ModalBody>
 
-            <ModalFooter className="flex justify-center">
-              <button onClick={onClose} className="cancel-button">
-                Cancelar
-              </button>
-
+            <ModalFooter className="flex justify-end">
               <button className="confirm-button" onClick={onClose}>
                 Salvar
               </button>
