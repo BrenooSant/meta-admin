@@ -29,7 +29,6 @@ export function ModalPagamentosAluno({ isOpen, onOpenChange }: Props) {
             className="rounded-t-xl"
         >
             <ModalContent>
-                {(onClose) => (
                     <>
                         <ModalHeader className="flex justify-center gradient-background text-white rounded-t-xl">
                             Pagamentos
@@ -54,7 +53,6 @@ export function ModalPagamentosAluno({ isOpen, onOpenChange }: Props) {
                             </Tabs>
                         </ModalBody>
                     </>
-                )}
             </ModalContent>
         </Modal>
     )
