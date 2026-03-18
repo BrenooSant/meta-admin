@@ -13,6 +13,7 @@
     "@heroui/react": "^2.8.10",
     "@hugeicons/core-free-icons": "^4.0.0",
     "@hugeicons/react": "^1.1.6",
+    "@supabase/supabase-js": "^2.99.2",
     "@tailwindcss/vite": "^4.2.1",
     "framer-motion": "^12.35.2",
     "react": "^19.2.0",
