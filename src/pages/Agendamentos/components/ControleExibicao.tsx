@@ -9,10 +9,11 @@ interface Props {
     setDataSelecionada: (data: CalendarDate) => void
     visualizacao: "dia" | "mes"
     setVisualizacao: (v: "dia" | "mes") => void
+    onNovoAgendamento: () => void
 }
 
 
-export function ControleExibicao({ dataSelecionada, setDataSelecionada, visualizacao, setVisualizacao }: Props) {
+export function ControleExibicao({ dataSelecionada, setDataSelecionada, visualizacao, setVisualizacao, onNovoAgendamento }: Props) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
     return (
@@ -80,6 +81,7 @@ export function ControleExibicao({ dataSelecionada, setDataSelecionada, visualiz
             <ModalNovoAgendamento
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
+                onSuccess={onNovoAgendamento}
             />
         </div>
     )
