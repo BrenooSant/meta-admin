@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date"
+import { useAgendamentos } from "../../hooks/useAgendamentos"
 import { ControleExibicao } from "./components/ControleExibicao"
 import { AgendamentosDia } from "./components/AgendamentosDia"
 import { AgendamentosMes } from "./components/AgendamentosMes"
@@ -10,6 +11,7 @@ export function AgendamentosPage() {
     )
 
     const [visualizacao, setVisualizacao] = useState<"dia" | "mes">("dia")
+    const { agendamentos, loading, error, refetch } = useAgendamentos(dataSelecionada)
 
     return (
         <main className="px-12 pb-12 mt-10">
@@ -20,6 +22,7 @@ export function AgendamentosPage() {
                         setDataSelecionada={setDataSelecionada}
                         visualizacao={visualizacao}
                         setVisualizacao={setVisualizacao}
+                        onNovoAgendamento={refetch}
                     />
                 </div>
 
@@ -28,6 +31,9 @@ export function AgendamentosPage() {
                         <AgendamentosDia
                             dataSelecionada={dataSelecionada}
                             setDataSelecionada={setDataSelecionada}
+                            agendamentos={agendamentos}
+                            loading={loading}
+                            error={error}
                         />
                     )}
 
