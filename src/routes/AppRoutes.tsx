@@ -6,21 +6,27 @@ import { AcademiaPage } from "../pages/Academia/AcademiaPage";
 import { FinanceiroPage } from "../pages/Financeiro/FinanceiroPage";
 import { ConfiguracoesPage } from "../pages/Configuraçoes/ConfiguracoesPage";
 import { MainLayout } from "../layouts/MainLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AuthRedirect } from "./components/AuthRedirect";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to="/login" replace/>} />
 
-        <Route element={<MainLayout />}>
-          <Route path="/agendamentos" element={<AgendamentosPage />} />
-          <Route path="/academia" element={<AcademiaPage />} />
-          <Route path="/financeiro" element={<FinanceiroPage />} />
-          <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/agendamentos" element={<AgendamentosPage />} />
+            <Route path="/academia" element={<AcademiaPage />} />
+            <Route path="/financeiro" element={<FinanceiroPage />} />
+            <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+          </Route>
         </Route>
 
-        <Route path="/login" element={<LoginPage />} />
+        <Route element={<AuthRedirect />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
 
       </Routes>
     </BrowserRouter>
