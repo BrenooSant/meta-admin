@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@heroui/react"
-import { useGerenciarAluno } from "../../../hooks/useGerenciarAluno"
+import { useGerenciarAluno } from "../../../hooks/academia/useGerenciarAluno"
 
 interface Props {
   isOpen: boolean

@@ -5,7 +5,7 @@ import { useDisclosure } from "@heroui/react"
 import { PlusSignIcon } from "@hugeicons/core-free-icons"
 import { TabelaAlunos } from "./components/TabelaAlunos"
 import { ModalAddAluno } from "./modals/ModalAddAluno"
-import { useAlunos, type Status } from "../../hooks/useAlunos"
+import { useAlunos, type Status } from "../../hooks/academia/useAlunos"
 
 export function AcademiaPage() {
     const { isOpen: isOpenNewAluno, onOpen: onOpenNewAluno, onOpenChange: onOpenChangeNewAluno } = useDisclosure()

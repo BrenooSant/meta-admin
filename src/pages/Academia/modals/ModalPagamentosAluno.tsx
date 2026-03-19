@@ -4,8 +4,8 @@ import {
 import { useRef } from "react"
 import { AbaNovoPagamento } from "../components/AbaNovoPagamento"
 import { AbaHistoricoPagamentos } from "../components/AbaHistoricoPagamentos"
-import { usePagamentosAluno } from "../../../hooks/usePagamentosAluno"
-import { type Aluno } from "../../../hooks/useAlunos"
+import { usePagamentosAluno } from "../../../hooks/academia/usePagamentosAluno"
+import { type Aluno } from "../../../hooks/academia/useAlunos"
 
 interface Props {
     isOpen: boolean

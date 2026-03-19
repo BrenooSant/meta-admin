@@ -5,7 +5,7 @@ import { CalendarDate } from "@internationalized/date"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Cancel01Icon } from "@hugeicons/core-free-icons"
 import { uploadComprovante } from "../../../hooks/useCloudinary"
-import { type Pagamento } from "../../../hooks/usePagamentosAluno"
+import { type Pagamento } from "../../../hooks/academia/usePagamentosAluno"
 
 interface Props {
   isOpen: boolean

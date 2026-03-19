@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@heroui/react"
-import { useGerenciarAluno } from "../../../hooks/useGerenciarAluno"
-import { type Aluno } from "../../../hooks/useAlunos"
+import { useGerenciarAluno } from "../../../hooks/academia/useGerenciarAluno"
+import { type Aluno } from "../../../hooks/academia/useAlunos"
 
 interface Props {
   isOpen: boolean

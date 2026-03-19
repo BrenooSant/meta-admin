@@ -3,7 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { UserCircleIcon, Money03Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 import { ModalInfoAluno } from "../modals/ModalInfoAluno"
 import { ModalPagamentosAluno } from "../modals/ModalPagamentosAluno"
-import { type Aluno, type Status } from "../../../hooks/useAlunos"
+import { type Aluno, type Status } from "../../../hooks/academia/useAlunos"
 import { useState } from "react"
 
 const statusConfig: Record<Status, { label: string; className: string }> = {

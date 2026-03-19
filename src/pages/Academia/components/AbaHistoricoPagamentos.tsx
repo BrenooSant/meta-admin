@@ -2,8 +2,8 @@ import { useState } from "react"
 import { useDisclosure } from "@heroui/react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { UserCircleIcon, PencilEdit01Icon } from '@hugeicons/core-free-icons'
-import { type Aluno } from "../../../hooks/useAlunos"
-import { type Pagamento } from "../../../hooks/usePagamentosAluno"
+import { type Aluno } from "../../../hooks/academia/useAlunos"
+import { type Pagamento } from "../../../hooks/academia/usePagamentosAluno"
 import { ModalEditarPagamento } from "../modals/ModalEditarPagamento"
 
 interface Props {

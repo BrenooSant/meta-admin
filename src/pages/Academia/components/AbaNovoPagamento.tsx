@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Cancel01Icon } from "@hugeicons/core-free-icons"
 import { supabase } from "../../../lib/supabase"
 import { uploadComprovante } from "../../../hooks/useCloudinary"
-import { type Aluno } from "../../../hooks/useAlunos"
+import { type Aluno } from "../../../hooks/academia/useAlunos"
 
 interface Props {
     aluno: Aluno | null
