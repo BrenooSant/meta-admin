@@ -3,10 +3,10 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input,
 } from "@heroui/react"
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date"
-import { useQuadras } from "../../../hooks/useQuadras"
-import { useEsportesPorQuadra } from "../../../hooks/useEsportesPorQuadra"
-import { useHorariosDisponiveis } from "../../../hooks/useHorariosDisponiveis"
-import { useNovoAgendamento } from "../../../hooks/useNovoAgendamento"
+import { useQuadras } from "../../../hooks/agendamentos/useQuadras"
+import { useEsportesPorQuadra } from "../../../hooks/agendamentos/useEsportesPorQuadra"
+import { useHorariosDisponiveis } from "../../../hooks/agendamentos/useHorariosDisponiveis"
+import { useNovoAgendamento } from "../../../hooks/agendamentos/useNovoAgendamento"
 
 interface Props {
   isOpen: boolean

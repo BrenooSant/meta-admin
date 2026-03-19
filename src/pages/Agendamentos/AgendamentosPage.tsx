@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date"
-import { useAgendamentos } from "../../hooks/useAgendamentos"
+import { useAgendamentos } from "../../hooks/agendamentos/useAgendamentos"
 import { ControleExibicao } from "./components/ControleExibicao"
 import { AgendamentosDia } from "./components/AgendamentosDia"
 import { AgendamentosMes } from "./components/AgendamentosMes"

@@ -1,7 +1,7 @@
 import { HugeiconsIcon } from "@hugeicons/react"
 import { SunCloud02Icon, Sun02Icon, Moon02Icon, CircleArrowLeft01Icon, CircleArrowRight01Icon, CalendarLock01Icon, UserCircleIcon, TennisBallIcon } from "@hugeicons/core-free-icons"
 import { CalendarDate, getLocalTimeZone } from "@internationalized/date"
-import { type Agendamento, type Turno } from "../../../hooks/useAgendamentos"
+import { type Agendamento, type Turno } from "../../../hooks/agendamentos/useAgendamentos"
 
 interface Props {
     dataSelecionada: CalendarDate

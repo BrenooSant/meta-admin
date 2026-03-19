@@ -1,7 +1,7 @@
 import { CalendarDate, getLocalTimeZone } from "@internationalized/date"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { CircleArrowLeft01Icon, CircleArrowRight01Icon } from "@hugeicons/core-free-icons"
-import { useAgendamentosMes } from "../../../hooks/useAgendamentos"
+import { useAgendamentosMes } from "../../../hooks/agendamentos/useAgendamentos"
 
 interface Props {
     dataSelecionada: CalendarDate

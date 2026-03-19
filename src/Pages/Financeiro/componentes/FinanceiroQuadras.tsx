@@ -71,7 +71,7 @@ function DonutChart({ data, label }: { data: EsporteData[]; label: "faturamento"
       <div className="flex flex-col gap-1 w-full mt-3">
         {items.map((d, i) => (
           <div key={i} className="flex items-center gap-2 text-xs text-gray-500">
-            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: d.color }} />
+            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
             <span>{d.name}</span>
             <span className="ml-auto font-semibold text-gray-700">
               {label === "faturamento" ? BRL(d.value) : d.value}
