@@ -40,7 +40,8 @@ export interface UseFinanceiroGeralReturn {
 
 export function useFinanceiroGeral(
   mes: number,  // 0-11
-  ano: number
+  ano: number,
+  yearAnual: number 
 ): UseFinanceiroGeralReturn {
   const [kpis, setKpis]                         = useState<GeralKpis | null>(null);
   const [porSemana, setPorSemana]               = useState<GeralSemanaData[]>([]);
@@ -80,16 +81,14 @@ export function useFinanceiroGeral(
   useEffect(() => {
     async function buscarAnual() {
       const [anualRes, segmentadoRes] = await Promise.all([
-        supabase.rpc("get_geral_anual",             { p_ano: ano }),
-        supabase.rpc("get_geral_anual_segmentado",  { p_ano: ano }),
+        supabase.rpc("get_geral_anual",            { p_ano: yearAnual }),  // ← yearAnual
+        supabase.rpc("get_geral_anual_segmentado", { p_ano: yearAnual }),  // ← yearAnual
       ]);
-
       if (!anualRes.error)      setAnual(anualRes.data ?? []);
       if (!segmentadoRes.error) setAnualSegmentado(segmentadoRes.data ?? []);
     }
-
     buscarAnual();
-  }, [ano]);
+  }, [yearAnual]); 
 
   return { kpis, porSemana, anual, anualSegmentado, loading, error };
 }

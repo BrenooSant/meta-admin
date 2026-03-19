@@ -89,7 +89,7 @@ export function FinanceiroQuadras() {
   const [displayYear, setDisplayYear] = useState(new Date().getFullYear());
 
   const { kpis, porEsporte, porSemana, anual, anualPorEsporte, loading, error } =
-    useFinanceiroQuadras(monthIdx, year);
+    useFinanceiroQuadras(monthIdx, year, displayYear);
 
   const prevMonth = () => {
     if (monthIdx === 0) { setMonthIdx(11); setYear(y => y - 1); }

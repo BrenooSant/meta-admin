@@ -48,7 +48,8 @@ export interface UseFinanceiroQuadrasReturn {
 
 export function useFinanceiroQuadras(
   mes: number, // 0-11
-  ano: number
+  ano: number,
+  yearAnual: number 
 ): UseFinanceiroQuadrasReturn {
   const [kpis, setKpis]                       = useState<QuadrasKpis | null>(null);
   const [porEsporte, setPorEsporte]           = useState<EsporteData[]>([]);
@@ -90,18 +91,16 @@ export function useFinanceiroQuadras(
 
   // ── Dados anuais (re-busca só quando o ano mudar) ─────────────────────────
   useEffect(() => {
-    async function buscarAnual() {
-      const [anualRes, anualEsportesRes] = await Promise.all([
-        supabase.rpc("get_quadras_anual",          { p_ano: ano }),
-        supabase.rpc("get_quadras_anual_esportes", { p_ano: ano }),
-      ]);
-
-      if (!anualRes.error)         setAnual(anualRes.data ?? []);
-      if (!anualEsportesRes.error) setAnualPorEsporte(anualEsportesRes.data ?? []);
-    }
-
-    buscarAnual();
-  }, [ano]);
+  async function buscarAnual() {
+    const [anualRes, anualEsportesRes] = await Promise.all([
+      supabase.rpc("get_quadras_anual",          { p_ano: yearAnual }),  // ← yearAnual
+      supabase.rpc("get_quadras_anual_esportes", { p_ano: yearAnual }),  // ← yearAnual
+    ]);
+    if (!anualRes.error)         setAnual(anualRes.data ?? []);
+    if (!anualEsportesRes.error) setAnualPorEsporte(anualEsportesRes.data ?? []);
+  }
+  buscarAnual();
+}, [yearAnual]);
 
   return { kpis, porEsporte, porSemana, anual, anualPorEsporte, loading, error };
 }

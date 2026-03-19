@@ -74,11 +74,9 @@ function DonutStatusAlunos({ ativos, expirados, inativos }: { ativos: number; ex
 export function FinanceiroAcademia() {
   const [monthIdx, setMonthIdx]       = useState(new Date().getMonth());
   const [year, setYear]               = useState(new Date().getFullYear());
-  const [displayYear, setDisplayYear] = useState(new Date().getFullYear());
+  const [yearAnual, setYearAnual] = useState(new Date().getFullYear());
 
-  const { kpis, statusAlunos, porSemana, anual, alunosPorMes, loading, error } =
-    useFinanceiroAcademia(monthIdx, year);
-
+  const { kpis, statusAlunos, porSemana, anual, alunosPorMes, loading, error } = useFinanceiroAcademia(monthIdx, year, yearAnual);
   const prevMonth = () => {
     if (monthIdx === 0) { setMonthIdx(11); setYear(y => y - 1); }
     else setMonthIdx(m => m - 1);
@@ -117,7 +115,7 @@ export function FinanceiroAcademia() {
       <p className="text-4xl font-extrabold text-gray-900">{kpis?.alunosAtivos ?? 0}</p>
     </div>
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-      <p className="text-xs font-medium text-gray-400 mb-2">Outros Alunos</p>
+      <p className="text-xs font-medium text-gray-400 mb-2">Expirados ou Inativos</p>
       <p className="text-4xl font-extrabold text-gray-900">{kpis?.outrosAlunos ?? 0}</p>
     </div>
   </div>
@@ -164,9 +162,9 @@ export function FinanceiroAcademia() {
 </div>
 
       <div className="flex items-center justify-center gap-5 mb-6">
-        <button onClick={() => setDisplayYear(y => y - 1)} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">‹</button>
-        <h2 className="text-green-800 font-extrabold text-xl w-20 text-center">{displayYear}</h2>
-        <button onClick={() => setDisplayYear(y => y + 1)} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">›</button>
+        <button onClick={() => setYearAnual(y => y - 1)} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">‹</button>
+        <h2 className="text-green-800 font-extrabold text-xl w-20 text-center">{yearAnual}</h2>
+        <button onClick={() => setYearAnual(y => y + 1)} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">›</button>
       </div>
 
       <div className="grid grid-cols-2 gap-5">
