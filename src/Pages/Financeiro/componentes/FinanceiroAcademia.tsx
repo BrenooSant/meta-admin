@@ -99,57 +99,69 @@ export function FinanceiroAcademia() {
     <div className="max-w-6xl mx-auto px-6 py-8">
 
       <div className="flex items-center justify-center gap-5 mb-6">
-        <button onClick={prevMonth} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">‹</button>
-        <h2 className="text-green-800 font-extrabold text-xl w-52 text-center">{MONTHS[monthIdx]}/{year}</h2>
-        <button onClick={nextMonth} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">›</button>
-      </div>
+  <button onClick={prevMonth} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">‹</button>
+  <h2 className="text-green-800 font-extrabold text-xl w-52 text-center">{MONTHS[monthIdx]}/{year}</h2>
+  <button onClick={nextMonth} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">›</button>
+</div>
 
-      <div className="grid grid-cols-3 gap-5 mb-5">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <p className="text-xs font-medium text-gray-400 text-center mb-3">Faturamento</p>
-          <p className="text-3xl font-extrabold text-gray-900 text-center mb-2">{BRL(kpis?.faturamento ?? 0)}</p>
-        </div>
+<div className="grid grid-cols-3 gap-5 mb-8">
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <p className="text-xs font-medium text-gray-400 text-center mb-3">Renovações por Semana</p>
-          <ResponsiveContainer width="100%" height={100}>
-            <BarChart
-              data={porSemana.map((s: SemanaData) => ({
-                semana: semanaLabels[s.semana] ?? `Sem ${s.semana}`,
-                renovacoes: s.renovacoes,
-              }))}
-              barSize={22}
-            >
-              <XAxis dataKey="semana" tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-              <YAxis hide />
-              <Tooltip content={<CustomTooltip suffix=" renovações" />} />
-              <Bar dataKey="renovacoes" radius={[4, 4, 0, 0]}>
-                {porSemana.map((_, i) => <Cell key={i} fill="#2563eb" />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+  {/* Coluna 1 — 3 cards empilhados */}
+  <div className="flex flex-col gap-4">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <p className="text-xs font-medium text-gray-400 text-center mb-3">Faturamento</p>
+      <p className="text-3xl font-extrabold text-gray-900 text-center">{BRL(kpis?.faturamento ?? 0)}</p>
+    </div>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+      <p className="text-xs font-medium text-gray-400 mb-2">Alunos Ativos</p>
+      <p className="text-4xl font-extrabold text-gray-900">{kpis?.alunosAtivos ?? 0}</p>
+    </div>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+      <p className="text-xs font-medium text-gray-400 mb-2">Outros Alunos</p>
+      <p className="text-4xl font-extrabold text-gray-900">{kpis?.outrosAlunos ?? 0}</p>
+    </div>
+  </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
-          <p className="text-xs font-medium text-gray-400 text-center mb-3">Status dos Alunos</p>
-          <DonutStatusAlunos
-            ativos={statusAlunos?.ativos ?? 0}
-            expirados={statusAlunos?.expirados ?? 0}
-            inativos={statusAlunos?.inativos ?? 0}
-          />
-        </div>
-      </div>
+  {/* Coluna 2 — Renovações por Semana */}
+<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+  <p className="text-xs font-medium text-gray-400 text-center mb-4">Renovações por Semana</p>
+  <div className="flex-1 min-h-0">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={porSemana.map((s: SemanaData) => ({
+          semana: semanaLabels[s.semana] ?? `Sem ${s.semana}`,
+          renovacoes: s.renovacoes,
+        }))}
+        barSize={36}
+        margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+      >
+        <XAxis dataKey="semana" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} allowDecimals={false} />
+        <Tooltip content={<CustomTooltip suffix=" renovações" />} cursor={{ fill: "#f3f4f6" }} />
+        <Bar dataKey="renovacoes" radius={[6, 6, 0, 0]}>
+          {porSemana.map((_entry, i) => (
+            <Cell key={i}
+              fill={i === porSemana.length - 1 ? "#1d4ed8" : "#2563eb"}
+              opacity={i === porSemana.length - 1 ? 1 : 0.75}
+            />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
 
-      <div className="grid grid-cols-2 gap-5 mb-8">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-          <p className="text-xs font-medium text-gray-400 mb-2">Alunos Ativos</p>
-          <p className="text-4xl font-extrabold text-gray-900 mb-1.5">{kpis?.alunosAtivos ?? 0}</p>
-        </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-          <p className="text-xs font-medium text-gray-400 mb-2">Outros Alunos</p>
-          <p className="text-4xl font-extrabold text-gray-900 mb-1.5">{kpis?.outrosAlunos ?? 0}</p>
-        </div>
-      </div>
+  {/* Coluna 3 — Status dos Alunos */}
+  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center justify-center">
+    <p className="text-xs font-medium text-gray-400 text-center mb-3">Status dos Alunos</p>
+    <DonutStatusAlunos
+      ativos={statusAlunos?.ativos ?? 0}
+      expirados={statusAlunos?.expirados ?? 0}
+      inativos={statusAlunos?.inativos ?? 0}
+    />
+  </div>
+
+</div>
 
       <div className="flex items-center justify-center gap-5 mb-6">
         <button onClick={() => setDisplayYear(y => y - 1)} className="w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center text-green-800 text-xl transition-colors">‹</button>
