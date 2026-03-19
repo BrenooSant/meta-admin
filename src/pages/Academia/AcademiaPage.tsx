@@ -1,12 +1,18 @@
+import { useState } from "react"
 import { Input, Select, SelectItem } from "@heroui/react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { useDisclosure } from "@heroui/react"
 import { PlusSignIcon } from "@hugeicons/core-free-icons"
 import { TabelaAlunos } from "./components/TabelaAlunos"
 import { ModalAddAluno } from "./modals/ModalAddAluno"
+import { useAlunos, type Status } from "../../hooks/useAlunos"
 
 export function AcademiaPage() {
     const { isOpen: isOpenNewAluno, onOpen: onOpenNewAluno, onOpenChange: onOpenChangeNewAluno } = useDisclosure()
+    const [busca, setBusca] = useState('')
+    const [filtroStatus, setFiltroStatus] = useState<Status | 'todos'>('todos')
+
+    const { alunos, loading, error, refetch } = useAlunos(busca, filtroStatus)
 
     return (
         <main className="px-12 pb-12 mt-10">
@@ -22,16 +28,17 @@ export function AcademiaPage() {
                         placeholder="Buscar aluno..."
                         aria-label="Buscar aluno"
                         type="text"
+                        value={busca}
+                        onValueChange={setBusca}
                         classNames={{
                             innerWrapper: "flex items-center gap-2 bg-white py-3 px-4 rounded-xl min-w-90 border border-maingreen",
                             input: "text-sm focus:outline-none border-transparent focus:border-transparent focus:ring-0 placeholder:!text-maingreen/80 !text-maingreen",
                             inputWrapper: "p-0",
                         }}
-                    >
-                    </Input>
+                    />
 
                     <Select
-                        aria-label="Escolha uma atividade"
+                        aria-label="Filtrar por status"
                         className="min-w-40"
                         placeholder="Todos"
                         classNames={{
@@ -40,51 +47,35 @@ export function AcademiaPage() {
                             selectorIcon: "!text-maingreen/80",
                             popoverContent: "border border-!maingreen rounded-xl",
                         }}
+                        onSelectionChange={(keys) => {
+                            const val = Array.from(keys)[0] as string
+                            setFiltroStatus((val as Status | 'todos') ?? 'todos')
+                        }}
                     >
-                        <SelectItem
-                            classNames={{
-                                base: "data-[hover=true]:!bg-activeuser/10 data-[selected=true]:!bg-maingreen/10",
-                                selectedIcon: "text-maingreen"
-                            }}
-                        >
-                            Ativo
-                        </SelectItem>
-                        <SelectItem
-                            classNames={{
-                                base: "data-[hover=true]:!bg-expireduser/10 data-[selected=true]:!bg-maingreen/10",
-                                selectedIcon: "text-maingreen"
-                            }}
-                        >
-                            Expirado
-                        </SelectItem>
-                        <SelectItem
-                            classNames={{
-                                base: "data-[hover=true]:!bg-inativeuser/10 data-[selected=true]:!bg-maingreen/10",
-                                selectedIcon: "text-maingreen"
-                            }}
-                        >
-                            Inativo
-                        </SelectItem>
+                        <SelectItem key="todos" classNames={{ base: "data-[hover=true]:!bg-maingreen/10" }}>Todos</SelectItem>
+                        <SelectItem key="ativo" classNames={{ base: "data-[hover=true]:!bg-activeuser/10", selectedIcon: "text-maingreen" }}>Ativo</SelectItem>
+                        <SelectItem key="expirado" classNames={{ base: "data-[hover=true]:!bg-expireduser/10", selectedIcon: "text-maingreen" }}>Expirado</SelectItem>
+                        <SelectItem key="inativo" classNames={{ base: "data-[hover=true]:!bg-inativeuser/10", selectedIcon: "text-maingreen" }}>Inativo</SelectItem>
                     </Select>
 
                     <button
-                        className="flex justify-center items-center rounded-full border 
-                        border-maingreen p-2 w-fit cursor-pointer hover:bg-maingreen/10
-                        transition-all duration-200
-                        " 
-                        onClick={onOpenNewAluno}>
+                        className="flex justify-center items-center rounded-full border border-maingreen p-2 w-fit cursor-pointer hover:bg-maingreen/10 transition-all duration-200"
+                        onClick={onOpenNewAluno}
+                    >
                         <HugeiconsIcon icon={PlusSignIcon} size={20} className="text-maingreen" />
                     </button>
                 </div>
             </div>
 
             <div className="mt-5">
-                <TabelaAlunos />
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+                <TabelaAlunos alunos={alunos} loading={loading} onRefetch={refetch} />
             </div>
 
             <ModalAddAluno
                 isOpen={isOpenNewAluno}
                 onOpenChange={onOpenChangeNewAluno}
+                onSuccess={refetch}
             />
         </main>
     )
