@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { SunCloud02Icon, Sun02Icon, Moon02Icon, CircleArrowLeft01Icon, CircleArrowRight01Icon, CalendarLock01Icon, UserCircleIcon, TennisBallIcon } from "@hugeicons/core-free-icons"
+import { SunCloud02Icon, Sun02Icon, Moon02Icon, CircleArrowLeft01Icon, CircleArrowRight01Icon, CalendarLock01Icon, UserCircleIcon, TennisBallIcon, VolleyballIcon, DashedLineCircleIcon } from "@hugeicons/core-free-icons"
 import { CalendarDate, getLocalTimeZone } from "@internationalized/date"
 import { type Agendamento, type Turno } from "../../../hooks/agendamentos/useAgendamentos"
 
@@ -19,8 +19,17 @@ const TURNOS: { turno: Turno; label: string; icon: any; className: string }[] = 
     { turno: 'night', label: 'Noite', icon: Moon02Icon, className: 'text-night' },
 ]
 
+function getIconeEsporte(nomeEsporte: string) {
+    switch (nomeEsporte) {
+        case 'Beach Tennis': return TennisBallIcon
+        case 'Vôlei': return VolleyballIcon
+        default: return DashedLineCircleIcon
+    }
+}
+
 function CardAgendamento({ ag }: { ag: Agendamento }) {
     const hora = new Date(ag.booking_start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    const iconeEsporte = getIconeEsporte(ag.esporte.name)
 
     return (
         <button className="card-day">
@@ -37,7 +46,7 @@ function CardAgendamento({ ag }: { ag: Agendamento }) {
                     <p className="text-sm">{ag.quadra.name}</p>
                 </div>
                 <div className="flex gap-x-2 items-center">
-                    <HugeiconsIcon icon={TennisBallIcon} size={24} />
+                    <HugeiconsIcon icon={iconeEsporte} size={24} />
                     <p className="text-sm">{ag.esporte.name}</p>
                 </div>
             </div>
