@@ -38,6 +38,7 @@ export function AgendamentosPage() {
                             agendamentos={agendamentos}
                             loading={loading}
                             error={error}
+                            onRefetch={refetch}
                         />
                     )}
 

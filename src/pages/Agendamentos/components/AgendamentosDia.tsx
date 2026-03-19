@@ -1,7 +1,21 @@
+import { useState } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { SunCloud02Icon, Sun02Icon, Moon02Icon, CircleArrowLeft01Icon, CircleArrowRight01Icon, CalendarLock01Icon, UserCircleIcon, TennisBallIcon, VolleyballIcon, DashedLineCircleIcon } from "@hugeicons/core-free-icons"
+import {
+    SunCloud02Icon,
+    Sun02Icon,
+    Moon02Icon,
+    CircleArrowLeft01Icon,
+    CircleArrowRight01Icon,
+    CalendarLock01Icon,
+    UserCircleIcon,
+    TennisBallIcon,
+    VolleyballIcon,
+    DashedLineCircleIcon,
+} from "@hugeicons/core-free-icons"
+import { useDisclosure } from "@heroui/react"
 import { CalendarDate, getLocalTimeZone } from "@internationalized/date"
 import { type Agendamento, type Turno } from "../../../hooks/agendamentos/useAgendamentos"
+import { ModalDetalhesAgendamento } from "../modals/ModalDetalhesAgendamento"
 
 interface Props {
     dataSelecionada: CalendarDate
@@ -9,6 +23,7 @@ interface Props {
     agendamentos: Agendamento[]
     loading: boolean
     error: string | null
+    onRefetch: () => void
 }
 
 const DIAS_SEMANA = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"]
@@ -27,12 +42,17 @@ function getIconeEsporte(nomeEsporte: string) {
     }
 }
 
-function CardAgendamento({ ag }: { ag: Agendamento }) {
+interface CardAgendamentoProps {
+    ag: Agendamento
+    onClick: (ag: Agendamento) => void
+}
+
+function CardAgendamento({ ag, onClick }: CardAgendamentoProps) {
     const hora = new Date(ag.booking_start).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     const iconeEsporte = getIconeEsporte(ag.esporte.name)
 
     return (
-        <button className="card-day">
+        <button className="card-day" onClick={() => onClick(ag)}>
             <div className="bg-maingreen rounded-t-2xl px-8 py-1.5 font-montserrat text-white">
                 <p className="text-center">{hora}</p>
             </div>
@@ -54,7 +74,7 @@ function CardAgendamento({ ag }: { ag: Agendamento }) {
     )
 }
 
-export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamentos, loading, error }: Props) {
+export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamentos, loading, error, onRefetch }: Props) {
     const jsDate = dataSelecionada.toDate(getLocalTimeZone())
     const diaSemana = DIAS_SEMANA[jsDate.getDay()]
     const dataFormatada = dataSelecionada.toString().split("-").reverse().join("/")
@@ -63,6 +83,14 @@ export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamen
     const retroceder = () => setDataSelecionada(dataSelecionada.subtract({ days: 1 }))
 
     const porTurno = (turno: Turno) => agendamentos.filter(a => a.turno === turno)
+
+    const { isOpen, onOpen, onOpenChange } = useDisclosure()
+    const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<Agendamento | null>(null)
+
+    function handleCardClick(ag: Agendamento) {
+        setAgendamentoSelecionado(ag)
+        onOpen()
+    }
 
     return (
         <div className="w-full flex flex-col items-center md:block">
@@ -107,13 +135,26 @@ export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamen
                             <div className="flex overflow-x-auto scrollbar-hide overflow-y-visible gap-x-4 py-3 px-3 md:px-1 pb-6 md:pb-2 md:grid md:grid-cols-6 md:gap-y-4 rounded-2xl">
                                 {itens.length === 0
                                     ? <p className="text-sm text-gray-400 col-span-6">Nenhum agendamento.</p>
-                                    : itens.map(ag => <CardAgendamento key={ag.id} ag={ag} />)
+                                    : itens.map(ag => (
+                                        <CardAgendamento
+                                            key={ag.id}
+                                            ag={ag}
+                                            onClick={handleCardClick}
+                                        />
+                                    ))
                                 }
                             </div>
                         </section>
                     )
                 })}
             </div>
+
+            <ModalDetalhesAgendamento
+                agendamento={agendamentoSelecionado}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                onCancelSuccess={onRefetch}
+            />
         </div>
     )
 }
