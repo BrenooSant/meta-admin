@@ -100,6 +100,19 @@ export function useAgendamentos(dataSelecionada: CalendarDate) {
   return { agendamentos, loading, error, refetch: buscar }
 }
 
+// -------------RESUMO DO DIA-------------
+ 
+export interface ResumoDia {
+  quantidade: number
+  faturamento: number
+}
+
+export function useResumoDia(agendamentos: Agendamento[]): ResumoDia {
+  const quantidade = agendamentos.length
+  const faturamento = agendamentos.reduce((acc, ag) => acc + (ag.price ?? 0), 0)
+  return { quantidade, faturamento }
+}
+
 //---------------MÊS---------------
 
 export interface AgendamentoResumoMes {

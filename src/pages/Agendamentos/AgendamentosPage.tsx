@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date"
-import { useAgendamentos } from "../../hooks/agendamentos/useAgendamentos"
+import { useAgendamentos, useResumoDia } from "../../hooks/agendamentos/useAgendamentos"
 import { ControleExibicao } from "./components/ControleExibicao"
 import { AgendamentosDia } from "./components/AgendamentosDia"
 import { AgendamentosMes } from "./components/AgendamentosMes"
@@ -13,6 +13,8 @@ export function AgendamentosPage() {
     const [visualizacao, setVisualizacao] = useState<"dia" | "mes">("dia")
     const { agendamentos, loading, error, refetch } = useAgendamentos(dataSelecionada)
 
+    const resumoDia = useResumoDia(agendamentos)
+
     return (
         <main className="px-12 pb-12 mt-10">
             <div className="flex flex-col-reverse md:flex-row md:items-start items-center">
@@ -23,6 +25,8 @@ export function AgendamentosPage() {
                         visualizacao={visualizacao}
                         setVisualizacao={setVisualizacao}
                         onNovoAgendamento={refetch}
+                        quantidade={resumoDia.quantidade}
+                        faturamento={resumoDia.faturamento}
                     />
                 </div>
 
