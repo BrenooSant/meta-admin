@@ -79,8 +79,9 @@ export function FinanceiroGeral() {
   const [year, setYear]               = useState(new Date().getFullYear());
   const [displayYear, setDisplayYear] = useState(new Date().getFullYear());
 
+  // Por isso:
   const { kpis, porSemana, anual, anualSegmentado, loading, error } =
-    useFinanceiroGeral(monthIdx, year);
+  useFinanceiroGeral(monthIdx, year, displayYear);
 
   const prevMonth = () => {
     if (monthIdx === 0) { setMonthIdx(11); setYear(y => y - 1); }
