@@ -16,7 +16,7 @@ interface Props {
 
 export function ModalPagamentosAluno({ isOpen, onOpenChange, aluno, onSuccess }: Props) {
     const houveAlteracao = useRef(false)
-    const { pagamentos, loading, pagina, totalPaginas, irParaPagina, atualizarComprovante } = usePagamentosAluno(aluno?.id ?? null)
+    const { pagamentos, loading, pagina, totalPaginas, irParaPagina, editarPagamento } = usePagamentosAluno(aluno?.id ?? null)
 
     return (
         <Modal
@@ -71,8 +71,8 @@ export function ModalPagamentosAluno({ isOpen, onOpenChange, aluno, onSuccess }:
                                     pagina={pagina}
                                     totalPaginas={totalPaginas}
                                     irParaPagina={irParaPagina}
-                                    atualizarComprovante={async (id, url) => {
-                                        const ok = await atualizarComprovante(id, url)
+                                    editarPagamento={async (id, dados) => {
+                                        const ok = await editarPagamento(id, dados)
                                         if (ok) houveAlteracao.current = true
                                         return ok
                                     }}
