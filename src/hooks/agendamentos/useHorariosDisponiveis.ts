@@ -24,13 +24,12 @@ export function useHorariosDisponiveis(
 
     const jsDate = data.toDate(getLocalTimeZone());
     const diaSemana = jsDate.getDay();
+    const ano = jsDate.getFullYear();
+    const mes = String(jsDate.getMonth() + 1).padStart(2, "0");
+    const dia = String(jsDate.getDate()).padStart(2, "0");
+    const dataISO = `${ano}-${mes}-${dia}`;
 
     async function buscar() {
-      const { data: intervalos } = await supabase
-        .from("court_opening_interval")
-        .select("open_time, close_time, court_id")
-        .eq("day_of_week", diaSemana);
-
       const { data: courtSport } = await supabase
         .from("court_sports")
         .select("court_id")
@@ -43,14 +42,47 @@ export function useHorariosDisponiveis(
         return;
       }
 
-      const intervalo = (intervalos ?? []).find(
-        (i: any) => i.court_id === courtSport.court_id,
-      );
+      const courtId = courtSport.court_id;
 
-      if (!intervalo) {
-        setHorarios([]);
-        setLoading(false);
-        return;
+      const { data: excecao } = await supabase
+        .from("court_schedule_exception")
+        .select("open_time, close_time, open_time_2, close_time_2")
+        .eq("court_id", courtId)
+        .eq("date", dataISO)
+        .maybeSingle();
+
+      let intervalos: { open_time: string; close_time: string }[] = [];
+
+      if (excecao !== null) {
+        if (!excecao.open_time) {
+          setHorarios([]);
+          setLoading(false);
+          return;
+        }
+        intervalos.push({
+          open_time: excecao.open_time,
+          close_time: excecao.close_time,
+        });
+        if (excecao.open_time_2 && excecao.close_time_2) {
+          intervalos.push({
+            open_time: excecao.open_time_2,
+            close_time: excecao.close_time_2,
+          });
+        }
+      } else {
+        const { data: gradePadrao } = await supabase
+          .from("court_opening_interval")
+          .select("open_time, close_time")
+          .eq("court_id", courtId)
+          .eq("day_of_week", diaSemana)
+          .maybeSingle();
+
+        if (!gradePadrao) {
+          setHorarios([]);
+          setLoading(false);
+          return;
+        }
+        intervalos.push(gradePadrao);
       }
 
       const inicioDia = new Date(jsDate);
@@ -61,7 +93,7 @@ export function useHorariosDisponiveis(
       const { data: todosCourtSports } = await supabase
         .from("court_sports")
         .select("id")
-        .eq("court_id", courtSport.court_id);
+        .eq("court_id", courtId);
 
       const todosIds = (todosCourtSports ?? []).map((cs: any) => cs.id);
 
@@ -79,30 +111,29 @@ export function useHorariosDisponiveis(
         }),
       );
 
-      const [openH, openM] = intervalo.open_time.split(":").map(Number);
-      const [closeH, closeM] = intervalo.close_time.split(":").map(Number);
-
       const slots: HorarioDisponivel[] = [];
-      let h = openH;
-      let m = openM;
 
-      while (h < closeH || (h === closeH && m < closeM)) {
-        const slotKey = `${h}:${String(m).padStart(2, "0")}`;
+      for (const intervalo of intervalos) {
+        const [openH, openM] = intervalo.open_time.split(":").map(Number);
+        const [closeH, closeM] = intervalo.close_time.split(":").map(Number);
 
-        if (!ocupados.has(slotKey)) {
-          const ano = jsDate.getFullYear();
-          const mes = String(jsDate.getMonth() + 1).padStart(2, "0");
-          const dia = String(jsDate.getDate()).padStart(2, "0");
-          const hora = String(h).padStart(2, "0");
-          const minuto = String(m).padStart(2, "0");
+        let h = openH;
+        let m = openM;
 
-          slots.push({
-            label: `${hora}:${minuto}`,
-            value: `${ano}-${mes}-${dia}T${hora}:${minuto}:00`,
-          });
+        while (h < closeH || (h === closeH && m < closeM)) {
+          const slotKey = `${h}:${String(m).padStart(2, "0")}`;
+
+          if (!ocupados.has(slotKey)) {
+            const hora = String(h).padStart(2, "0");
+            const minuto = String(m).padStart(2, "0");
+            slots.push({
+              label: `${hora}:${minuto}`,
+              value: `${ano}-${mes}-${dia}T${hora}:${minuto}:00`,
+            });
+          }
+
+          h += 1;
         }
-
-        h += 1;
       }
 
       setHorarios(slots);

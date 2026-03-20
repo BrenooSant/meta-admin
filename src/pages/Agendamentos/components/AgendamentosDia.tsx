@@ -16,6 +16,7 @@ import { useDisclosure } from "@heroui/react"
 import { CalendarDate, getLocalTimeZone } from "@internationalized/date"
 import { type Agendamento, type Turno } from "../../../hooks/agendamentos/useAgendamentos"
 import { ModalDetalhesAgendamento } from "../modals/ModalDetalhesAgendamento"
+import { ModalDisponibilidade } from "../modals/ModalDisponibilidade"
 
 interface Props {
     dataSelecionada: CalendarDate
@@ -81,15 +82,15 @@ export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamen
 
     const avancar = () => setDataSelecionada(dataSelecionada.add({ days: 1 }))
     const retroceder = () => setDataSelecionada(dataSelecionada.subtract({ days: 1 }))
-
     const porTurno = (turno: Turno) => agendamentos.filter(a => a.turno === turno)
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure()
+    const detalhesModal = useDisclosure()
+    const disponibilidadeModal = useDisclosure()
     const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<Agendamento | null>(null)
 
     function handleCardClick(ag: Agendamento) {
         setAgendamentoSelecionado(ag)
-        onOpen()
+        detalhesModal.onOpen()
     }
 
     return (
@@ -107,7 +108,10 @@ export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamen
                     </button>
                 </div>
 
-                <button className="flex mt-2 gap-x-2 items-center cursor-pointer text-secondarygreen">
+                <button
+                    className="flex mt-2 gap-x-2 items-center cursor-pointer text-secondarygreen"
+                    onClick={disponibilidadeModal.onOpen}
+                >
                     <HugeiconsIcon icon={CalendarLock01Icon} size={20} />
                     <p className="font-montserrat text-sm">Ajustar Disponibilidade</p>
                 </button>
@@ -151,9 +155,15 @@ export function AgendamentosDia({ dataSelecionada, setDataSelecionada, agendamen
 
             <ModalDetalhesAgendamento
                 agendamento={agendamentoSelecionado}
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
+                isOpen={detalhesModal.isOpen}
+                onOpenChange={detalhesModal.onOpenChange}
                 onCancelSuccess={onRefetch}
+            />
+
+            <ModalDisponibilidade
+                isOpen={disponibilidadeModal.isOpen}
+                onOpenChange={disponibilidadeModal.onOpenChange}
+                dataSelecionada={dataSelecionada}
             />
         </div>
     )
