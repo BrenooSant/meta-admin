@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input,
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+  Input, Select, SelectItem, Calendar,
 } from "@heroui/react"
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date"
 import { useQuadras } from "../../../hooks/agendamentos/useQuadras"
 import { useEsportesPorQuadra } from "../../../hooks/agendamentos/useEsportesPorQuadra"
 import { useHorariosDisponiveis } from "../../../hooks/agendamentos/useHorariosDisponiveis"
-import { useNovoAgendamento } from "../../../hooks/agendamentos/useNovoAgendamento"
+import { ModalConfirmarAgendamento, type DadosConfirmacao } from "./ModalConfirmarAgendamento"
 
 interface Props {
   isOpen: boolean
@@ -21,12 +22,16 @@ function aplicarMascaraTelefone(valor: string): string {
   return `(${nums.slice(0, 2)}) ${nums.slice(2, 7)}-${nums.slice(7)}`
 }
 
-const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-
-const selectClass = {
+const inputClass = {
   innerWrapper: "flex items-center gap-2 bg-lightblue py-3 px-4 rounded-xl",
   input: "text-sm focus:outline-none border-transparent focus:border-transparent focus:ring-0",
   inputWrapper: "p-0",
+}
+
+const selectClass = {
+  trigger: "bg-lightblue rounded-xl px-4 h-12 shadow-none border-none data-[hover=true]:bg-lightblue/80",
+  value: "text-sm",
+  popoverContent: "rounded-xl shadow-lg border border-gray-100",
 }
 
 export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props) {
@@ -37,12 +42,15 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
   const [dataSelecionada, setDataSelecionada] = useState<CalendarDate | null>(null)
   const [horario, setHorario] = useState<string | null>(null)
 
+  const [confirmacaoAberta, setConfirmacaoAberta] = useState(false)
+  const [dadosConfirmacao, setDadosConfirmacao] = useState<DadosConfirmacao | null>(null)
+
   const { quadras } = useQuadras()
   const { esportes } = useEsportesPorQuadra(quadraId)
   const { horarios } = useHorariosDisponiveis(courtSportId, dataSelecionada)
-  const { criarAgendamento, loading, error } = useNovoAgendamento()
 
   const quadraSelecionada = quadras.find(q => q.id === quadraId)
+  const esporteSelecionado = esportes.find(e => e.court_sport_id === courtSportId)
   const price = quadraSelecionada?.price_per_hour ?? 0
 
   const phoneNumeros = telefone.replace(/\D/g, '')
@@ -64,167 +72,229 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
     setHorario(null)
   }
 
-  async function handleSalvar(onClose: () => void) {
+  function handleAbrirConfirmacao(onClose: () => void) {
     if (!podeSalvar) return
 
-    const ok = await criarAgendamento({
+    setDadosConfirmacao({
       fullname,
       phone: phoneNumeros,
+      telefoneFormatado: telefone,
       court_sport_id: courtSportId!,
-      data: dataSelecionada!,
       horario: horario!,
       price,
+      data: dataSelecionada!,
+      quadraNome: quadraSelecionada?.name ?? '—',
+      quadraImageUrl: quadraSelecionada?.image_url ?? null,
+      esporteNome: esporteSelecionado?.sport_name ?? '—',
     })
 
-    if (ok) {
-      resetar()
-      onSuccess?.()
-      onClose()
-    }
+    onClose()
+    setConfirmacaoAberta(true)
+  }
+
+  function handleVoltarParaFormulario() {
+    setConfirmacaoAberta(false)
+    onOpenChange(true)
+  }
+
+  function handleConfirmacaoSuccess() {
+    setConfirmacaoAberta(false)
+    resetar()
+    onSuccess?.()
   }
 
   const hoje = today(getLocalTimeZone())
-  const diasDisponiveis = Array.from({ length: 60 }, (_, i) => hoje.add({ days: i }))
+  const maxDate = hoje.add({ days: 59 })
+
+  const turnoInfo: Record<string, { label: string; className: string }> = {}
+  horarios.forEach(h => {
+    const hora = parseInt(h.label.split(':')[0])
+    if (hora >= 18)
+      turnoInfo[h.value] = { label: 'Noite', className: 'bg-night/15 text-night' }
+    else if (hora >= 13)
+      turnoInfo[h.value] = { label: 'Tarde', className: 'bg-afternoon/15 text-afternoon' }
+    else
+      turnoInfo[h.value] = { label: 'Manhã', className: 'bg-morning/15 text-morning' }
+  })
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onOpenChange={(open) => { if (!open) resetar(); onOpenChange(open) }}
-      placement="center"
-      classNames={{
-        wrapper: "px-4",
-        closeButton: "text-white hover:bg-white/40 cursor-pointer p-1"
-      }}
-    >
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex justify-center gradient-background text-white">
-              Novo Agendamento
-            </ModalHeader>
+    <>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={(open) => { if (!open) resetar(); onOpenChange(open) }}
+        placement="center"
+        scrollBehavior="inside"
+        classNames={{
+          wrapper: "px-4 !overflow-hidden",
+          closeButton: "text-white hover:bg-white/40 cursor-pointer p-1",
+          base: "max-h-[90vh] my-auto",
+        }}
+        className="rounded-t-xl"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex justify-center gradient-background text-white rounded-t-xl">
+                Novo Agendamento
+              </ModalHeader>
 
-            <ModalBody className="flex flex-col gap-y-3 mt-3">
-              {/* Nome */}
-              <Input
-                placeholder="Nome Completo"
-                aria-label="Nome Completo"
-                value={fullname}
-                onValueChange={setFullname}
-                classNames={selectClass}
-              />
+              <ModalBody className="flex flex-col gap-y-3 mt-3 overflow-y-auto">
 
-              {/* Telefone com máscara */}
-              <Input
-                placeholder="(XX) 9XXXX-XXXX"
-                aria-label="Telefone"
-                value={telefone}
-                onValueChange={(v) => setTelefone(aplicarMascaraTelefone(v))}
-                isInvalid={telefone.length > 0 && !telefoneValido}
-                errorMessage="Telefone inválido"
-                classNames={selectClass}
-              />
+                {/* Nome */}
+                <Input
+                  placeholder="Nome Completo"
+                  aria-label="Nome Completo"
+                  value={fullname}
+                  onValueChange={setFullname}
+                  classNames={inputClass}
+                />
 
-              {/* Quadra */}
-              <div className="bg-lightblue py-3 px-4 rounded-xl">
-                <select
-                  className="w-full bg-transparent text-sm focus:outline-none"
-                  value={quadraId ?? ''}
-                  onChange={(e) => {
-                    setQuadraId(e.target.value || null)
+                {/* Telefone */}
+                <Input
+                  placeholder="(XX) 9XXXX-XXXX"
+                  aria-label="Telefone"
+                  value={telefone}
+                  onValueChange={(v) => setTelefone(aplicarMascaraTelefone(v))}
+                  isInvalid={telefone.length > 0 && !telefoneValido}
+                  errorMessage="Telefone inválido"
+                  classNames={inputClass}
+                />
+
+                {/* Quadra */}
+                <Select
+                  placeholder="Selecionar Quadra"
+                  aria-label="Quadra"
+                  selectedKeys={quadraId ? new Set([quadraId]) : new Set()}
+                  onSelectionChange={(keys) => {
+                    const val = Array.from(keys)[0] as string ?? null
+                    setQuadraId(val)
                     setCourtSportId(null)
                     setDataSelecionada(null)
                     setHorario(null)
                   }}
+                  classNames={selectClass}
                 >
-                  <option value="">Selecionar Quadra</option>
                   {quadras.map(q => (
-                    <option key={q.id} value={q.id}>{q.name}</option>
+                    <SelectItem key={q.id}>{q.name}</SelectItem>
                   ))}
-                </select>
-              </div>
+                </Select>
 
-              {/* Esporte — só aparece após quadra selecionada */}
-              {quadraId && (
-                <div className="bg-lightblue py-3 px-4 rounded-xl">
-                  <select
-                    className="w-full bg-transparent text-sm focus:outline-none"
-                    value={courtSportId ?? ''}
-                    onChange={(e) => {
-                      setCourtSportId(e.target.value || null)
+                {/* Esporte */}
+                {quadraId && (
+                  <Select
+                    placeholder="Selecionar Esporte"
+                    aria-label="Esporte"
+                    selectedKeys={courtSportId ? new Set([courtSportId]) : new Set()}
+                    onSelectionChange={(keys) => {
+                      const val = Array.from(keys)[0] as string ?? null
+                      setCourtSportId(val)
                       setDataSelecionada(null)
                       setHorario(null)
                     }}
+                    classNames={selectClass}
                   >
-                    <option value="">Selecionar Esporte</option>
                     {esportes.map(e => (
-                      <option key={e.court_sport_id} value={e.court_sport_id}>
-                        {e.sport_name}
-                      </option>
+                      <SelectItem key={e.court_sport_id}>{e.sport_name}</SelectItem>
                     ))}
-                  </select>
-                </div>
-              )}
+                  </Select>
+                )}
 
-              {/* Data — só aparece após esporte selecionado */}
-              {courtSportId && (
-                <div className="bg-lightblue py-3 px-4 rounded-xl">
-                  <select
-                    className="w-full bg-transparent text-sm focus:outline-none"
-                    value={dataSelecionada?.toString() ?? ''}
-                    onChange={(e) => {
-                      if (!e.target.value) { setDataSelecionada(null); return }
-                      const [y, m, d] = e.target.value.split('-').map(Number)
-                      setDataSelecionada(new CalendarDate(y, m, d))
-                      setHorario(null)
-                    }}
-                  >
-                    <option value="">Selecionar Data</option>
-                    {diasDisponiveis.map(d => {
-                      const js = d.toDate(getLocalTimeZone())
-                      const label = `${String(js.getDate()).padStart(2, '0')} de ${MESES[js.getMonth()]} de ${js.getFullYear()}`
-                      return (
-                        <option key={d.toString()} value={d.toString()}>{label}</option>
-                      )
-                    })}
-                  </select>
-                </div>
-              )}
+                {/* Data — calendário inline */}
+                {courtSportId && (
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-xs text-gray-500 px-1">Selecionar Data</p>
+                    <div className="flex justify-center bg-lightblue rounded-xl p-3">
+                      <Calendar
+                        aria-label="Data do agendamento"
+                        value={dataSelecionada}
+                        onChange={(d) => { setDataSelecionada(d); setHorario(null) }}
+                        minValue={hoje}
+                        maxValue={maxDate}
+                        focusedValue={dataSelecionada ?? hoje}
+                        onFocusChange={(d) => { if (d) setDataSelecionada(d) }}
+                        classNames={{
+                          cellButton: `data-[selected=true]:bg-maingreen data-[selected=true]:text-white`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
 
-              {/* Horário — só aparece após data selecionada */}
-              {dataSelecionada && (
-                <div className="bg-lightblue py-3 px-4 rounded-xl">
-                  <select
-                    className="w-full bg-transparent text-sm focus:outline-none"
-                    value={horario ?? ''}
-                    onChange={(e) => setHorario(e.target.value || null)}
-                  >
-                    <option value="">Selecionar Horário</option>
-                    {horarios.length === 0
-                      ? <option disabled>Nenhum horário disponível</option>
-                      : horarios.map(h => (
-                        <option key={h.value} value={h.value}>{h.label}</option>
-                      ))
-                    }
-                  </select>
-                </div>
-              )}
+                {/* Horários */}
+                {dataSelecionada && (
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-xs text-gray-500 px-1">Selecionar Horário</p>
 
-              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-            </ModalBody>
+                    {horarios.length === 0 ? (
+                      <p className="text-sm text-gray-400 text-center py-3">
+                        Nenhum horário disponível para esta data.
+                      </p>
+                    ) : (
+                      <Select
+                        placeholder="Selecionar Horário"
+                        aria-label="Horário"
+                        selectedKeys={horario ? new Set([horario]) : new Set()}
+                        onSelectionChange={(keys) => {
+                          const val = Array.from(keys)[0] as string ?? null
+                          setHorario(val)
+                        }}
+                        classNames={{
+                          ...selectClass,
+                          listboxWrapper: "max-h-48",
+                          popoverContent: "rounded-xl shadow-lg border border-gray-100 p-1",
+                        }}
+                        renderValue={(items) => {
+                          const item = items[0]
+                          const h = horarios.find(h => h.value === item?.key)
+                          return h ? (
+                            <span className="text-sm font-medium">{h.label}</span>
+                          ) : null
+                        }}
+                      >
+                        {horarios.map(h => (
+                          <SelectItem
+                            key={h.value}
+                            textValue={h.label}
+                            classNames={{
+                              base: "rounded-lg px-3 py-2 data-[hover=true]:bg-lightblue",
+                            }}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className="font-medium text-sm">{h.label}</span>
+                              <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${turnoInfo[h.value]?.className}`}>
+                                {turnoInfo[h.value]?.label}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    )}
+                  </div>
+                )}
+              </ModalBody>
 
-            <ModalFooter className="flex justify-center">
-              <button onClick={onClose} className="cancel-button">Cancelar</button>
-              <button
-                className="confirm-button disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!podeSalvar || loading}
-                onClick={() => handleSalvar(onClose)}
-              >
-                {loading ? 'Salvando...' : 'Salvar'}
-              </button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+              <ModalFooter className="flex justify-center">
+                <button onClick={onClose} className="cancel-button">Cancelar</button>
+                <button
+                  className="confirm-button disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!podeSalvar}
+                  onClick={() => handleAbrirConfirmacao(onClose)}
+                >
+                  Salvar
+                </button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <ModalConfirmarAgendamento
+        isOpen={confirmacaoAberta}
+        onOpenChange={setConfirmacaoAberta}
+        dados={dadosConfirmacao}
+        onVoltar={handleVoltarParaFormulario}
+        onSuccess={handleConfirmacaoSuccess}
+      />
+    </>
   )
 }

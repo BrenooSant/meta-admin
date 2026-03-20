@@ -10,11 +10,18 @@ interface Props {
     visualizacao: "dia" | "mes"
     setVisualizacao: (v: "dia" | "mes") => void
     onNovoAgendamento: () => void
+    quantidade: number
+    faturamento: number
 }
 
 
-export function ControleExibicao({ dataSelecionada, setDataSelecionada, visualizacao, setVisualizacao, onNovoAgendamento }: Props) {
+export function ControleExibicao({ dataSelecionada, setDataSelecionada, visualizacao, setVisualizacao, onNovoAgendamento, quantidade, faturamento }: Props) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
+
+    const faturamentoFormatado = faturamento.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    })
 
     return (
         <div className="flex flex-col">
@@ -35,12 +42,12 @@ export function ControleExibicao({ dataSelecionada, setDataSelecionada, visualiz
                 <div className="mt-6 space-y-3">
                     <div className="flex items-center gap-x-2">
                         <HugeiconsIcon icon={Appointment02Icon} size={20} />
-                        <span className="text-xs font-medium">11 Horário(s) Marcado(s)</span>
+                        <span className="text-xs font-medium">{quantidade} Horário(s) Marcado(s)</span>
                     </div>
 
                     <div className="flex items-center gap-x-2">
                         <HugeiconsIcon icon={MoneyAdd02Icon} size={20} />
-                        <span className="text-xs font-medium">Faturamento Previsto: R$ 6060,00</span>
+                        <span className="text-xs font-medium">Faturamento Previsto: {faturamentoFormatado}</span>
                     </div>
                 </div>
             </div>
