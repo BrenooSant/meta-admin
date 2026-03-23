@@ -52,7 +52,7 @@ export function ModalConfirmarExclusao({ isOpen, onOpenChange, nomeQuadra, onCon
               </Button>
               <Button
                 color="danger"
-                className="flex-1 rounded-xl font-semibold"
+                className="flex-1 rounded-xl font-semibold bg-red-500"
                 isLoading={loading}
                 onPress={() => handleConfirmar(onClose)}
               >

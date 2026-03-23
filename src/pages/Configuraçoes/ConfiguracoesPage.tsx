@@ -18,7 +18,7 @@ import { ModalConfirmarExclusao } from './modals/ModalConfirmarExclusao'
 import { ModalCropImagem } from './modals/ModalCropImagem'
 
 const ICONE_ESPORTE: Record<string, any> = {
-  'Beach Tênis': TennisBallIcon,
+  'Beach Tennis': TennisBallIcon,
   'Vôlei':       VolleyballIcon,
 }
 

@@ -6,7 +6,7 @@ import { Pen01Icon, Delete02Icon, CircleArrowLeft01Icon, CircleArrowRight01Icon 
 import { useGerenciarHorarios, type GradePadrao, type Excecao, type QuadraHorarios } from '../../hooks/configuracoes/useGerenciarHorarios'
 import { ModalEditarGrade } from './modals/ModalEditarGrade'
 import { ModalExcecao } from './modals/ModalExcecao'
-import { ModalConfirmarExclusao } from '../Configuraçoes/modals/ModalConfirmarExclusao'
+import { ModalConfirmarExclusaoExcecao } from './modals/ModalConfirmarExclusaoExcecao'
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 const DIAS_COMPLETO = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
@@ -290,10 +290,10 @@ export function GerenciarHorariosPage() {
         onSalvar={salvarExcecao}
       />
 
-      <ModalConfirmarExclusao
+      <ModalConfirmarExclusaoExcecao
         isOpen={exclusaoModal.isOpen}
         onOpenChange={exclusaoModal.onOpenChange}
-        nomeQuadra={excecaoExcluindo ? formatarData(excecaoExcluindo.date) : ''}
+        dataExcecao={excecaoExcluindo ? formatarData(excecaoExcluindo.date) : ''}
         onConfirmar={() => excluirExcecao(excecaoExcluindo!.id)}
       />
     </main>
