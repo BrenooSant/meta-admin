@@ -1,8 +1,8 @@
 import { memo, useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { useFinanceiroQuadrasMes } from "../../../hooks/financeiro/useFinanceiroQuadras";
-import { useFinanceiroQuadrasAnual } from "../../../hooks/financeiro/useFinanceiroQuadras";
-import type { EsporteData, SemanaData, MesData, MesEsporteData } from "../../../hooks/financeiro/useFinanceiroQuadras";
+import { useFinanceiroQuadrasMes } from "../../../hooks/financeiro/useFinanceiroQuadra";
+import { useFinanceiroQuadrasAnual } from "../../../hooks/financeiro/useFinanceiroQuadra";
+import type { EsporteData, SemanaData, MesData, MesEsporteData } from "../../../hooks/financeiro/useFinanceiroQuadra";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CircleArrowLeft01Icon, CircleArrowRight01Icon } from "@hugeicons/core-free-icons";
 
