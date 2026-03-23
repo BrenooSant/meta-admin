@@ -1,73 +1,49 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase"; // ajuste o caminho do seu cliente
+import { supabase } from "../../lib/supabase";
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
-
 export interface QuadrasKpis {
   faturamento: number;
   agendamentos: number;
   clientes: number;
   quadraMaisAlugada: string;
 }
-
 export interface EsporteData {
   esporte: string;
   agendamentos: number;
   faturamento: number;
 }
-
 export interface SemanaData {
   semana: number;
   agendamentos: number;
   faturamento: number;
 }
-
 export interface MesData {
   mes: string;
   faturamento: number;
   agendamentos: number;
 }
-
 export interface MesEsporteData {
   mes: string;
   esporte: string;
   agendamentos: number;
 }
 
-export interface UseFinanceiroQuadrasReturn {
-  kpis: QuadrasKpis | null;
-  porEsporte: EsporteData[];
-  porSemana: SemanaData[];
-  anual: MesData[];
-  anualPorEsporte: MesEsporteData[];
-  loading: boolean;
-  error: string | null;
-}
+// ── Hook mensal — re-executa apenas quando mês/ano mudam ─────────────────────
+export function useFinanceiroQuadrasMes(mes: number, ano: number) {
+  const [kpis, setKpis]           = useState<QuadrasKpis | null>(null);
+  const [porEsporte, setPorEsporte] = useState<EsporteData[]>([]);
+  const [porSemana, setPorSemana]  = useState<SemanaData[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState<string | null>(null);
 
-// ── Hook ──────────────────────────────────────────────────────────────────────
-
-export function useFinanceiroQuadras(
-  mes: number, // 0-11
-  ano: number,
-  yearAnual: number 
-): UseFinanceiroQuadrasReturn {
-  const [kpis, setKpis]                       = useState<QuadrasKpis | null>(null);
-  const [porEsporte, setPorEsporte]           = useState<EsporteData[]>([]);
-  const [porSemana, setPorSemana]             = useState<SemanaData[]>([]);
-  const [anual, setAnual]                     = useState<MesData[]>([]);
-  const [anualPorEsporte, setAnualPorEsporte] = useState<MesEsporteData[]>([]);
-  const [loading, setLoading]                 = useState(true);
-  const [error, setError]                     = useState<string | null>(null);
-
-  // "2026-12-01"
   const mesFormatado = `${ano}-${String(mes + 1).padStart(2, "0")}-01`;
 
-  // ── Dados do mês (re-busca quando mês/ano mudar) ──────────────────────────
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    async function buscarMes() {
+    async function buscar() {
       const [kpisRes, esportesRes, semanasRes] = await Promise.all([
         supabase.rpc("get_quadras_kpis",     { p_mes: mesFormatado }),
         supabase.rpc("get_quadras_esportes", { p_mes: mesFormatado }),
@@ -86,21 +62,30 @@ export function useFinanceiroQuadras(
       setLoading(false);
     }
 
-    buscarMes();
+    buscar();
   }, [mesFormatado]);
 
-  // ── Dados anuais (re-busca só quando o ano mudar) ─────────────────────────
-  useEffect(() => {
-  async function buscarAnual() {
-    const [anualRes, anualEsportesRes] = await Promise.all([
-      supabase.rpc("get_quadras_anual",          { p_ano: yearAnual }),  // ← yearAnual
-      supabase.rpc("get_quadras_anual_esportes", { p_ano: yearAnual }),  // ← yearAnual
-    ]);
-    if (!anualRes.error)         setAnual(anualRes.data ?? []);
-    if (!anualEsportesRes.error) setAnualPorEsporte(anualEsportesRes.data ?? []);
-  }
-  buscarAnual();
-}, [yearAnual]);
+  return { kpis, porEsporte, porSemana, loading, error };
+}
 
-  return { kpis, porEsporte, porSemana, anual, anualPorEsporte, loading, error };
+// ── Hook anual — re-executa apenas quando o ano anual muda ───────────────────
+export function useFinanceiroQuadrasAnual(yearAnual: number) {
+  const [anual, setAnual]                     = useState<MesData[]>([]);
+  const [anualPorEsporte, setAnualPorEsporte] = useState<MesEsporteData[]>([]);
+
+  useEffect(() => {
+    async function buscar() {
+      const [anualRes, anualEsportesRes] = await Promise.all([
+        supabase.rpc("get_quadras_anual",          { p_ano: yearAnual }),
+        supabase.rpc("get_quadras_anual_esportes", { p_ano: yearAnual }),
+      ]);
+
+      if (!anualRes.error)         setAnual(anualRes.data ?? []);
+      if (!anualEsportesRes.error) setAnualPorEsporte(anualEsportesRes.data ?? []);
+    }
+
+    buscar();
+  }, [yearAnual]);
+
+  return { anual, anualPorEsporte };
 }
