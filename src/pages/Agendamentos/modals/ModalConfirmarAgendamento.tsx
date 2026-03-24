@@ -8,11 +8,11 @@ import {
     Money03Icon,
     TennisBallIcon,
     VolleyballIcon,
+    FootballIcon,
     DashedLineCircleIcon,
     AlbumNotFound01Icon,
 } from "@hugeicons/core-free-icons"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react"
-import { CalendarDate } from "@internationalized/date"
 import { useNovoAgendamento } from "../../../hooks/agendamentos/useNovoAgendamento"
 
 export interface DadosConfirmacao {
@@ -21,11 +21,11 @@ export interface DadosConfirmacao {
     telefoneFormatado: string
     court_sport_id: string
     horario: string
+    slotDurationMinutes: number
     price: number
     quadraNome: string
     quadraImageUrl: string | null
     esporteNome: string
-    data: CalendarDate
 }
 
 interface Props {
@@ -38,10 +38,16 @@ interface Props {
 
 function getIconeEsporte(nomeEsporte: string) {
     switch (nomeEsporte) {
+        case 'Futvôlei': return FootballIcon
         case 'Beach Tennis': return TennisBallIcon
         case 'Vôlei': return VolleyballIcon
         default: return DashedLineCircleIcon
     }
+}
+
+function formatarDuracao(minutos: number): string {
+    if (minutos < 120) return `${minutos} min`
+    return `${minutos / 60}h`
 }
 
 export function ModalConfirmarAgendamento({ isOpen, onOpenChange, dados, onVoltar, onSuccess }: Props) {
@@ -74,8 +80,8 @@ export function ModalConfirmarAgendamento({ isOpen, onOpenChange, dados, onVolta
             fullname: dados!.fullname,
             phone: dados!.phone,
             court_sport_id: dados!.court_sport_id,
-            data: dados!.data,
             horario: dados!.horario,
+            slotDurationMinutes: dados!.slotDurationMinutes,
             price: dados!.price,
         })
 
@@ -123,7 +129,12 @@ export function ModalConfirmarAgendamento({ isOpen, onOpenChange, dados, onVolta
                             <span className="text-gray-300">|</span>
                             <div className="flex items-center gap-2">
                                 <HugeiconsIcon icon={Time02Icon} size={20} className="text-maingreen shrink-0" />
-                                <span className="text-sm">{horaFormatada}</span>
+                                <span className="text-sm">
+                                    {horaFormatada}
+                                    <span className="text-gray-400 ml-1">
+                                        ({formatarDuracao(dados.slotDurationMinutes)})
+                                    </span>
+                                </span>
                             </div>
                         </div>
 

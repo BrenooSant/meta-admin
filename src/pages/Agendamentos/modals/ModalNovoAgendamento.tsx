@@ -51,7 +51,9 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
 
   const quadraSelecionada = quadras.find(q => q.id === quadraId)
   const esporteSelecionado = esportes.find(e => e.court_sport_id === courtSportId)
-  const price = quadraSelecionada?.price_per_hour ?? 0
+
+  // Preço e duração vêm do slot selecionado, não mais da quadra
+  const slotSelecionado = horarios.find(h => h.value === horario) ?? null
 
   const phoneNumeros = telefone.replace(/\D/g, '')
   const telefoneValido = phoneNumeros.length === 11 && phoneNumeros[2] === '9'
@@ -61,7 +63,8 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
     telefoneValido &&
     courtSportId &&
     dataSelecionada &&
-    horario
+    horario &&
+    slotSelecionado !== null
 
   function resetar() {
     setFullname('')
@@ -73,7 +76,7 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
   }
 
   function handleAbrirConfirmacao(onClose: () => void) {
-    if (!podeSalvar) return
+    if (!podeSalvar || !slotSelecionado) return
 
     setDadosConfirmacao({
       fullname,
@@ -81,8 +84,8 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
       telefoneFormatado: telefone,
       court_sport_id: courtSportId!,
       horario: horario!,
-      price,
-      data: dataSelecionada!,
+      slotDurationMinutes: slotSelecionado.slotDurationMinutes,
+      price: slotSelecionado.price,
       quadraNome: quadraSelecionada?.name ?? '—',
       quadraImageUrl: quadraSelecionada?.image_url ?? null,
       esporteNome: esporteSelecionado?.sport_name ?? '—',
@@ -116,6 +119,15 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
     else
       turnoInfo[h.value] = { label: 'Manhã', className: 'bg-morning/15 text-morning' }
   })
+
+  function formatarDuracao(minutos: number): string {
+    if (minutos < 120) return `${minutos}min`
+    return `${minutos / 60}h`
+  }
+
+  function formatarPreco(price: number): string {
+    return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  }
 
   return (
     <>
@@ -246,9 +258,15 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
                         renderValue={(items) => {
                           const item = items[0]
                           const h = horarios.find(h => h.value === item?.key)
-                          return h ? (
-                            <span className="text-sm font-medium">{h.label}</span>
-                          ) : null
+                          if (!h) return null
+                          return (
+                            <span className="text-sm font-medium">
+                              {h.label}
+                              <span className="text-gray-400 font-normal ml-1.5">
+                                · {formatarDuracao(h.slotDurationMinutes)} · {formatarPreco(h.price)}
+                              </span>
+                            </span>
+                          )
                         }}
                       >
                         {horarios.map(h => (
@@ -259,11 +277,22 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
                               base: "rounded-lg px-3 py-2 data-[hover=true]:bg-lightblue",
                             }}
                           >
-                            <div className="flex items-center justify-between w-full">
-                              <span className="font-medium text-sm">{h.label}</span>
-                              <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${turnoInfo[h.value]?.className}`}>
-                                {turnoInfo[h.value]?.label}
-                              </span>
+                            <div className="flex items-center justify-between w-full gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm">{h.label}</span>
+                                <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${turnoInfo[h.value]?.className}`}>
+                                  {turnoInfo[h.value]?.label}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-xs text-gray-400">
+                                  {formatarDuracao(h.slotDurationMinutes)}
+                                </span>
+                                <span className="text-gray-200">·</span>
+                                <span className="text-xs font-semibold text-maingreen">
+                                  {formatarPreco(h.price)}
+                                </span>
+                              </div>
                             </div>
                           </SelectItem>
                         ))}

@@ -4,7 +4,6 @@ import { supabase } from '../../lib/supabase'
 export interface Quadra {
   id: string
   name: string
-  price_per_hour: number
   image_url: string | null
 }
 
@@ -15,7 +14,7 @@ export function useQuadras() {
   useEffect(() => {
     supabase
       .from('courts')
-      .select('id, name, price_per_hour, image_url')
+      .select('id, name, image_url')
       .order('name')
       .then(({ data }) => {
         setQuadras(data ?? [])
