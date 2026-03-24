@@ -74,7 +74,7 @@ function DonutStatusAlunos({ ativos, expirados, inativos }: { ativos: number; ex
         {data.map((d, i) => (
           <div key={i} className="flex items-center gap-1.5 text-xs text-gray-500">
             <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-            {d.label}
+            {d.label} ({d.value})
           </div>
         ))}
       </div>
@@ -90,7 +90,7 @@ function SecaoMensal({ monthIdx, year }: { monthIdx: number; year: number }) {
   if (error) return <div className="flex items-center justify-center h-64 text-red-400 text-sm">{error}</div>;
 
   return (
-    <div className="grid grid-cols-3 gap-5 mb-8">
+    <div className="grid grid-cols-4 gap-5 mb-8">
       {/* Coluna 1 */}
       <div className="flex flex-col gap-4">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -108,7 +108,7 @@ function SecaoMensal({ monthIdx, year }: { monthIdx: number; year: number }) {
       </div>
 
       {/* Coluna 2 — Renovações por Semana */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col col-span-2">
         <p className="text-xs font-medium text-gray-400 text-center mb-4">Renovações por Semana</p>
         <div className="flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
