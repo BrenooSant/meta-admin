@@ -27,43 +27,26 @@ export interface MesAlunosData {
   mes: string;
   alunos: number;
 }
-export interface UseFinanceiroAcademiaReturn {
-  kpis: AcademiaKpis | null;
-  statusAlunos: StatusAlunos | null;
-  porSemana: SemanaData[];
-  anual: MesData[];
-  alunosPorMes: MesAlunosData[];
-  loading: boolean;
-  error: string | null;
-}
 
-// ── Hook ──────────────────────────────────────────────────────────────────────
-export function useFinanceiroAcademia(
-  mes: number,
-  ano: number,
-  yearAnual: number
-): UseFinanceiroAcademiaReturn {
+// ── Hook mensal — re-executa apenas quando mês/ano mudam ─────────────────────
+export function useFinanceiroAcademiaMes(mes: number, ano: number) {
   const [kpis, setKpis]                 = useState<AcademiaKpis | null>(null);
   const [statusAlunos, setStatusAlunos] = useState<StatusAlunos | null>(null);
   const [porSemana, setPorSemana]       = useState<SemanaData[]>([]);
-  const [anual, setAnual]               = useState<MesData[]>([]);
-  const [alunosPorMes, setAlunosPorMes] = useState<MesAlunosData[]>([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState<string | null>(null);
 
-  // ── Data correta: hoje se for o mês atual, senão primeiro dia do mês ──────
   const hoje = new Date();
   const ehMesAtual = hoje.getMonth() === mes && hoje.getFullYear() === ano;
   const mesFormatado = ehMesAtual
-    ? hoje.toISOString().split("T")[0]                          // "2026-03-19"
-    : `${ano}-${String(mes + 1).padStart(2, "0")}-01`;          // "2026-04-01"
+    ? hoje.toISOString().split("T")[0]
+    : `${ano}-${String(mes + 1).padStart(2, "0")}-01`;
 
-  // ── Dados do mês ──────────────────────────────────────────────────────────
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    async function buscarMes() {
+    async function buscar() {
       const [kpisRes, semanasRes, statusRes] = await Promise.all([
         supabase.rpc("get_academia_kpis",          { p_mes: mesFormatado }),
         supabase.rpc("get_academia_semanas",        { p_mes: mesFormatado }),
@@ -82,12 +65,19 @@ export function useFinanceiroAcademia(
       setLoading(false);
     }
 
-    buscarMes();
+    buscar();
   }, [mesFormatado]);
 
-  // ── Dados anuais ──────────────────────────────────────────────────────────
+  return { kpis, statusAlunos, porSemana, loading, error };
+}
+
+// ── Hook anual — re-executa apenas quando o ano anual muda ───────────────────
+export function useFinanceiroAcademiaAnual(yearAnual: number) {
+  const [anual, setAnual]               = useState<MesData[]>([]);
+  const [alunosPorMes, setAlunosPorMes] = useState<MesAlunosData[]>([]);
+
   useEffect(() => {
-    async function buscarAnual() {
+    async function buscar() {
       const [anualRes, alunosRes] = await Promise.all([
         supabase.rpc("get_academia_anual",      { p_ano: yearAnual }),
         supabase.rpc("get_academia_alunos_mes", { p_ano: yearAnual }),
@@ -97,8 +87,8 @@ export function useFinanceiroAcademia(
       if (!alunosRes.error) setAlunosPorMes(alunosRes.data ?? []);
     }
 
-    buscarAnual();
+    buscar();
   }, [yearAnual]);
 
-  return { kpis, statusAlunos, porSemana, anual, alunosPorMes, loading, error };
+  return { anual, alunosPorMes };
 }

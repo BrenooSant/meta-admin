@@ -38,7 +38,7 @@ interface Props {
 
 function getIconeEsporte(nomeEsporte: string) {
     switch (nomeEsporte) {
-        case 'Beach Tênis': return TennisBallIcon
+        case 'Beach Tennis': return TennisBallIcon
         case 'Vôlei': return VolleyballIcon
         default: return DashedLineCircleIcon
     }
