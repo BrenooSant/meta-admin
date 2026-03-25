@@ -7,6 +7,7 @@ import { FinanceiroPage } from "../pages/Financeiro/FinanceiroPage";
 import { ConfiguracoesPage } from "../pages/Configuraçoes/ConfiguracoesPage";
 import { ComprovantePage } from "../pages/Comprovante/ComprovantePage"
 import { GerenciarHorariosPage } from "../pages/GerenciarHorarios/GerenciarHorariosPage";
+import { AgendamentosFixosPage } from "../pages/AgendamentosFixos/AgendamentosFixosPage";
 import { MainLayout } from "../layouts/MainLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthRedirect } from "./components/AuthRedirect";
@@ -24,6 +25,7 @@ const AppRoutes = () => {
             <Route path="/financeiro" element={<FinanceiroPage />} />
             <Route path="/configuracoes" element={<ConfiguracoesPage />} />
             <Route path="/configuracoes/horarios" element={<GerenciarHorariosPage />} />
+            <Route path="/configuracoes/agendamentos-fixos" element={<AgendamentosFixosPage />} />
           </Route>
         </Route>
 
