@@ -10,11 +10,10 @@ import { ModalCropImagem } from './ModalCropImagem'
 interface Props {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  quadra?: QuadraCompleta | null   // null/undefined = nova quadra
+  quadra?: QuadraCompleta | null
   onSalvar: (dados: {
     id?: string
     name: string
-    price_per_hour: number
     image_url: string | null
     sport_ids: string[]
   }) => Promise<boolean>
@@ -30,7 +29,6 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
   const { esportes: todosEsportes } = useTodosEsportes()
 
   const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [sportIds, setSportIds] = useState<string[]>([])
   const [uploading, _setUploading] = useState(false)
@@ -40,16 +38,13 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const cropModal = useDisclosure()
 
-  // Popula campos ao editar
   useEffect(() => {
     if (quadra) {
       setName(quadra.name)
-      setPrice(String(quadra.price_per_hour))
       setImageUrl(quadra.image_url)
       setSportIds(quadra.esportes.map(e => e.id))
     } else {
       setName('')
-      setPrice('')
       setImageUrl(null)
       setSportIds([])
     }
@@ -71,21 +66,14 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
     e.target.value = ''
   }
 
-  function handleCropSuccess(url: string) {
-    setImageUrl(url)
-  }
-
   async function handleSalvar(onClose: () => void) {
     setErro(null)
-    const priceNum = parseFloat(price.replace(',', '.'))
     if (!name.trim()) return setErro('Informe o nome da quadra.')
-    if (isNaN(priceNum) || priceNum <= 0) return setErro('Informe um valor válido.')
 
     setSaving(true)
     const ok = await onSalvar({
       id: quadra?.id,
       name: name.trim(),
-      price_per_hour: priceNum,
       image_url: imageUrl,
       sport_ids: sportIds,
     })
@@ -94,8 +82,6 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
     if (ok) onClose()
     else setErro('Erro ao salvar quadra. Tente novamente.')
   }
-
-  const isEdicao = !!quadra
 
   return (
     <>
@@ -115,7 +101,7 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
           {(onClose) => (
             <>
               <ModalHeader className="flex justify-center gradient-background text-white rounded-t-xl">
-                {isEdicao ? 'Editar Quadra' : 'Nova Quadra'}
+                {quadra ? 'Editar Quadra' : 'Nova Quadra'}
               </ModalHeader>
 
               <ModalBody className="flex flex-col gap-y-4 mt-3">
@@ -135,7 +121,8 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-gray-400">
                       <HugeiconsIcon icon={AlbumNotFound01Icon} size={36} />
-                      <p className="text-xs">{uploading ? 'Enviando...' : 'Clique para adicionar imagem'}</p>                  </div>
+                      <p className="text-xs">{uploading ? 'Enviando...' : 'Clique para adicionar imagem'}</p>
+                    </div>
                   )}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
@@ -146,16 +133,6 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
                   aria-label="Nome"
                   value={name}
                   onValueChange={setName}
-                  classNames={inputClass}
-                />
-
-                {/* Preço */}
-                <Input
-                  placeholder="Valor por hora (ex: 60,00)"
-                  aria-label="Valor por hora"
-                  value={price}
-                  onValueChange={setPrice}
-                  startContent={<span className="text-sm text-gray-400 shrink-0">R$</span>}
                   classNames={inputClass}
                 />
 
@@ -170,7 +147,7 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
                           key={e.id}
                           onClick={() => toggleEsporte(e.id)}
                           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer
-                          ${ativo
+                            ${ativo
                               ? 'bg-maingreen text-white'
                               : 'bg-lightblue text-gray-600 hover:bg-lightblue/70'
                             }`}
@@ -204,7 +181,7 @@ export function ModalQuadra({ isOpen, onOpenChange, quadra, onSalvar }: Props) {
         isOpen={cropModal.isOpen}
         onOpenChange={cropModal.onOpenChange}
         imageSrc={cropSrc}
-        onUploadSuccess={handleCropSuccess}
+        onUploadSuccess={(url) => setImageUrl(url)}
         cropShape="rect"
         aspect={16 / 9}
       />

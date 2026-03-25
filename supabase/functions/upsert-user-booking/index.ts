@@ -35,13 +35,11 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { data: adminData, error: adminError } = await supabaseAdmin
+    const { data: adminData } = await supabaseAdmin
       .from("admins")
       .select("id")
       .eq("id", user.id)
       .single()
-
-      console.log("adminData:", adminData, "adminError:", adminError)
 
     if (!adminData) {
       return new Response(
@@ -50,16 +48,14 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { phone, fullname, court_sport_id, booking_start, price } = await req.json()
+    const { phone, fullname, court_sport_id, booking_start, booking_end, price } = await req.json()
 
-    if (!phone || !fullname || !court_sport_id || !booking_start || !price) {
+    if (!phone || !fullname || !court_sport_id || !booking_start || !booking_end || !price) {
       return new Response(
         JSON.stringify({ error: "Campos obrigatórios faltando." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
-
-    const booking_end = new Date(new Date(booking_start).getTime() + 60 * 60 * 1000).toISOString()
 
     const { data: usuarioExistente } = await supabaseAdmin
       .from("users")
@@ -70,7 +66,6 @@ Deno.serve(async (req) => {
     let userId: string
 
     if (usuarioExistente) {
-      // Atualiza o nome e reutiliza o id
       await supabaseAdmin
         .from("users")
         .update({ fullname })

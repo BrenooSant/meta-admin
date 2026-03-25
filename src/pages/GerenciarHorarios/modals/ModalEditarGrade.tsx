@@ -6,7 +6,7 @@ interface Props {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   grade: GradePadrao | null
-  onSalvar: (id: string, open_time: string, close_time: string) => Promise<boolean>
+  onSalvar: (params: { id: string; court_id?: string; day_of_week?: number; open_time: string; close_time: string }) => Promise<boolean>
 }
 
 const DIAS = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
@@ -24,8 +24,8 @@ const selectClass = {
 }
 
 export function ModalEditarGrade({ isOpen, onOpenChange, grade, onSalvar }: Props) {
-  const [openTime, setOpenTime]   = useState('08:00:00')
-  const [closeTime, setCloseTime] = useState('22:00:00')
+  const [openTime, setOpenTime]   = useState('06:00:00')
+  const [closeTime, setCloseTime] = useState('23:00:00')
   const [saving, setSaving]       = useState(false)
   const [erro, setErro]           = useState<string | null>(null)
 
@@ -44,7 +44,7 @@ export function ModalEditarGrade({ isOpen, onOpenChange, grade, onSalvar }: Prop
       return
     }
     setSaving(true)
-    const ok = await onSalvar(grade.id, openTime, closeTime)
+    const ok = await onSalvar({ id: grade.id, court_id: grade.court_id, day_of_week: grade.day_of_week, open_time: openTime, close_time: closeTime })
     setSaving(false)
     if (ok) onClose()
     else setErro('Erro ao salvar. Tente novamente.')
@@ -66,7 +66,7 @@ export function ModalEditarGrade({ isOpen, onOpenChange, grade, onSalvar }: Prop
         {(onClose) => (
           <>
             <ModalHeader className="flex justify-center gradient-background text-white rounded-t-xl">
-              Editar Grade Padrão
+              {grade?.id ? 'Editar Grade Padrão' : 'Nova Grade Padrão'}
             </ModalHeader>
 
             <ModalBody className="flex flex-col gap-y-4 mt-3">

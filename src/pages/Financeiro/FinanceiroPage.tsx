@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { FinanceiroQuadras } from "../../Pages/Financeiro/componentes/FinanceiroQuadras";
-import { FinanceiroAcademia } from "../../Pages/Financeiro/componentes/FinanceiroAcademia";
-import { FinanceiroGeral } from "../../Pages/Financeiro/componentes/FinanceiroGeral";
+import { FinanceiroQuadras } from "./components/FinanceiroQuadras";
+import { FinanceiroAcademia } from "./components/FinanceiroAcademia";
+import { FinanceiroGeral } from "./components/FinanceiroGeral";
 
 type Filtro = "geral" | "academia" | "quadras";
 

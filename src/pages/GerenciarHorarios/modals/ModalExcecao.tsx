@@ -41,10 +41,10 @@ export function ModalExcecao({ isOpen, onOpenChange, courtId, excecao, onSalvar 
 
   const [data, setData]           = useState<CalendarDate>(hoje)
   const [modo, setModo]           = useState<Modo>('fechado')
-  const [openTime, setOpenTime]   = useState('08:00:00')
+  const [openTime, setOpenTime]   = useState('06:00:00')
   const [closeTime, setCloseTime] = useState('22:00:00')
   const [segundoIntervalo, setSegundoIntervalo] = useState(false)
-  const [openTime2, setOpenTime2]   = useState('08:00:00')
+  const [openTime2, setOpenTime2]   = useState('06:00:00')
   const [closeTime2, setCloseTime2] = useState('22:00:00')
   const [reason, setReason]   = useState('')
   const [saving, setSaving]   = useState(false)

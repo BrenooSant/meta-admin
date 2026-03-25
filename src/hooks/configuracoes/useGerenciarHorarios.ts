@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 
 export interface GradePadrao {
   id: string
+  court_id?: string
   day_of_week: number
   open_time: string
   close_time: string
@@ -93,12 +94,30 @@ export function useGerenciarHorarios() {
 
   useEffect(() => { buscar() }, [buscar])
 
-  async function salvarGrade(id: string, open_time: string, close_time: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('court_opening_interval')
-      .update({ open_time, close_time })
-      .eq('id', id)
-    if (error) return false
+  async function salvarGrade(params: {
+    id?: string
+    court_id?: string
+    day_of_week?: number
+    open_time: string
+    close_time: string
+  }): Promise<boolean> {
+    if (params.id) {
+      const { error } = await supabase
+        .from('court_opening_interval')
+        .update({ open_time: params.open_time, close_time: params.close_time })
+        .eq('id', params.id)
+      if (error) return false
+    } else {
+      const { error } = await supabase
+        .from('court_opening_interval')
+        .insert({
+          court_id: params.court_id,
+          day_of_week: params.day_of_week,
+          open_time: params.open_time,
+          close_time: params.close_time,
+        })
+      if (error) return false
+    }
     await buscar()
     return true
   }
