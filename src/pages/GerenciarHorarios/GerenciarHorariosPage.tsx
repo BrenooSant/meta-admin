@@ -46,6 +46,7 @@ function TagExcecao({ excecao }: { excecao: Excecao }) {
 function SecaoQuadra({
   quadra,
   onEditarGrade,
+  onNovaGrade,
   onNovaExcecao,
   onEditarExcecao,
   onExcluirExcecao,
@@ -56,6 +57,7 @@ function SecaoQuadra({
 }: {
   quadra: QuadraHorarios
   onEditarGrade: (grade: GradePadrao) => void
+  onNovaGrade: (courtId: string, dayOfWeek: number) => void
   onNovaExcecao: (courtId: string) => void
   onEditarExcecao: (excecao: Excecao) => void
   onExcluirExcecao: (excecao: Excecao) => void
@@ -79,10 +81,7 @@ function SecaoQuadra({
             Grade Padrão
           </p>
 
-          {quadra.grade.length === 0 ? (
-            <p className="text-sm text-gray-400">Nenhuma grade configurada.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {DIAS.map((_diaAbrev, idx) => {
                 const item = quadra.grade.find(g => g.day_of_week === idx)
                 return (
@@ -99,19 +98,25 @@ function SecaoQuadra({
                         }
                       </p>
                     </div>
-                    {item && (
+                    {item ? (
                       <button
                         onClick={() => onEditarGrade(item)}
                         className="w-7 h-7 rounded-full bg-maingreen flex items-center justify-center cursor-pointer hover:bg-maingreen/80 transition-colors shrink-0 ml-2"
                       >
                         <HugeiconsIcon icon={Pen01Icon} size={12} className="text-white" />
                       </button>
+                    ) : (
+                      <button
+                        onClick={() => onNovaGrade(quadra.id, idx)}
+                        className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-maingreen hover:text-white transition-colors shrink-0 ml-2 text-gray-400 font-bold text-base leading-none"
+                      >
+                        +
+                      </button>
                     )}
                   </div>
                 )
               })}
             </div>
-          )}
         </div>
 
         {/* Exceções */}
@@ -218,6 +223,11 @@ export function GerenciarHorariosPage() {
     gradeModal.onOpen()
   }
 
+  function handleNovaGrade(courtId: string, dayOfWeek: number) {
+    setGradeSelecionada({ id: '', court_id: courtId, day_of_week: dayOfWeek, open_time: '08:00:00', close_time: '22:00:00' })
+    gradeModal.onOpen()
+  }
+
   function handleNovaExcecao(courtId: string) {
     setCourtIdExcecao(courtId)
     setExcecaoSelecionada(null)
@@ -262,6 +272,7 @@ export function GerenciarHorariosPage() {
                 key={quadra.id}
                 quadra={quadra}
                 onEditarGrade={handleEditarGrade}
+                onNovaGrade={handleNovaGrade}
                 onNovaExcecao={handleNovaExcecao}
                 onEditarExcecao={(exc) => handleEditarExcecao(quadra.id, exc)}
                 onExcluirExcecao={handleExcluirExcecao}

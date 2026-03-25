@@ -19,9 +19,7 @@ interface CustomTooltipProps {
 const SPORT_COLORS: Record<string, string> = {
   "Beach Tennis": "#3B82F6",
   "Vôlei": "#EF4444",
-  "Futsal": "#EAB308",
-  "Futebol": "#22C55E",
-  "Futebol Society": "#A855F7",
+  "Futvôlei": "#22C55E",
 };
 const BRL = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 const semanaLabels: Record<number, string> = { 1: "1-7", 2: "8-14", 3: "15-21", 4: "22-28", 5: "29-31" };

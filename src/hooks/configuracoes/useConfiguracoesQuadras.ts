@@ -9,10 +9,20 @@ export interface Esporte {
 export interface QuadraCompleta {
   id: string
   name: string
-  price_per_hour: number
   image_url: string | null
   esportes: Esporte[]
 }
+
+export interface FaixaPreco {
+  id: string
+  day_of_week: number
+  start_time: string
+  end_time: string
+  price: number
+  slot_duration_minutes: 60 | 120 | 180
+}
+
+// ─── Quadras ──────────────────────────────────────────────────────────────────
 
 export function useConfiguracoesQuadras() {
   const [quadras, setQuadras] = useState<QuadraCompleta[]>([])
@@ -26,7 +36,7 @@ export function useConfiguracoesQuadras() {
     const { data, error: err } = await supabase
       .from('courts')
       .select(`
-        id, name, price_per_hour, image_url,
+        id, name, image_url,
         court_sports ( id, sports ( id, name ) )
       `)
       .order('name')
@@ -40,7 +50,6 @@ export function useConfiguracoesQuadras() {
     const formatadas: QuadraCompleta[] = (data ?? []).map((c: any) => ({
       id: c.id,
       name: c.name,
-      price_per_hour: c.price_per_hour,
       image_url: c.image_url ?? null,
       esportes: (c.court_sports ?? []).map((cs: any) => ({
         id: cs.sports?.id ?? '',
@@ -57,7 +66,6 @@ export function useConfiguracoesQuadras() {
   async function salvarQuadra(dados: {
     id?: string
     name: string
-    price_per_hour: number
     image_url: string | null
     sport_ids: string[]
   }): Promise<boolean> {
@@ -66,7 +74,7 @@ export function useConfiguracoesQuadras() {
     if (isEdicao) {
       const { error: updateErr } = await supabase
         .from('courts')
-        .update({ name: dados.name, price_per_hour: dados.price_per_hour, image_url: dados.image_url })
+        .update({ name: dados.name, image_url: dados.image_url })
         .eq('id', dados.id!)
 
       if (updateErr) return false
@@ -82,7 +90,7 @@ export function useConfiguracoesQuadras() {
     } else {
       const { data: nova, error: insertErr } = await supabase
         .from('courts')
-        .insert({ name: dados.name, price_per_hour: dados.price_per_hour, image_url: dados.image_url })
+        .insert({ name: dados.name, image_url: dados.image_url })
         .select('id')
         .single()
 
@@ -116,15 +124,11 @@ export function useConfiguracoesQuadras() {
 
       if (bookingsErr) return false
 
-      await supabase.from('court_opening_interval').delete().eq('court_id', courtId)
-
-      const { error: csErr } = await supabase
-        .from('court_sports')
-        .delete()
-        .eq('court_id', courtId)
-
-      if (csErr) return false
+      await supabase.from('court_sports').delete().eq('court_id', courtId)
     }
+
+    await supabase.from('court_opening_interval').delete().eq('court_id', courtId)
+    await supabase.from('court_pricing').delete().eq('court_id', courtId)
 
     const { error: courtErr } = await supabase
       .from('courts')
@@ -139,6 +143,60 @@ export function useConfiguracoesQuadras() {
 
   return { quadras, loading, error, salvarQuadra, excluirQuadra, refetch: buscar }
 }
+
+// ─── Precificação ─────────────────────────────────────────────────────────────
+
+export function usePrecificacaoQuadra(courtId: string | null) {
+  const [faixas, setFaixas] = useState<FaixaPreco[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const buscar = useCallback(async () => {
+    if (!courtId) { setFaixas([]); return }
+    setLoading(true)
+
+    const { data } = await supabase
+      .from('court_pricing')
+      .select('id, day_of_week, start_time, end_time, price, slot_duration_minutes')
+      .eq('court_id', courtId)
+      .order('day_of_week')
+      .order('start_time')
+
+    setFaixas(
+      (data ?? []).map((r: any) => ({
+        id: r.id,
+        day_of_week: r.day_of_week,
+        start_time: r.start_time.slice(0, 5),   // "HH:mm"
+        end_time: r.end_time.slice(0, 5),
+        price: Number(r.price),
+        slot_duration_minutes: r.slot_duration_minutes,
+      }))
+    )
+    setLoading(false)
+  }, [courtId])
+
+  useEffect(() => { buscar() }, [buscar])
+
+  async function adicionarFaixa(faixa: Omit<FaixaPreco, 'id'>): Promise<boolean> {
+    const { error } = await supabase.from('court_pricing').insert({
+      court_id: courtId,
+      ...faixa,
+    })
+    if (error) return false
+    await buscar()
+    return true
+  }
+
+  async function removerFaixa(id: string): Promise<boolean> {
+    const { error } = await supabase.from('court_pricing').delete().eq('id', id)
+    if (error) return false
+    await buscar()
+    return true
+  }
+
+  return { faixas, loading, adicionarFaixa, removerFaixa }
+}
+
+// ─── Esportes ─────────────────────────────────────────────────────────────────
 
 export function useTodosEsportes() {
   const [esportes, setEsportes] = useState<Esporte[]>([])

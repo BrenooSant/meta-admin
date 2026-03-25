@@ -6,20 +6,24 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Pen01Icon,
   Delete02Icon,
+  FootballIcon,
   TennisBallIcon,
   VolleyballIcon,
   DashedLineCircleIcon,
   AlbumNotFound01Icon,
+  Money03Icon,
 } from '@hugeicons/core-free-icons'
 import { useCompany } from '../../hooks/company/useCompany'
 import { useConfiguracoesQuadras, type QuadraCompleta } from '../../hooks/configuracoes/useConfiguracoesQuadras'
 import { ModalQuadra } from './modals/ModalQuadra'
+import { ModalPrecificacao } from './modals/ModalPrecificacao'
 import { ModalConfirmarExclusao } from './modals/ModalConfirmarExclusao'
 import { ModalCropImagem } from './modals/ModalCropImagem'
 
 const ICONE_ESPORTE: Record<string, any> = {
+  'Futvôlei': FootballIcon,
   'Beach Tennis': TennisBallIcon,
-  'Vôlei':       VolleyballIcon,
+  'Vôlei': VolleyballIcon,
 }
 
 function getIconeEsporte(nome: string) {
@@ -31,16 +35,13 @@ function CardQuadra({
   quadra,
   onEditar,
   onExcluir,
+  onPrecificacao,
 }: {
   quadra: QuadraCompleta
   onEditar: () => void
   onExcluir: () => void
+  onPrecificacao: () => void
 }) {
-  const precoFormatado = quadra.price_per_hour.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
-
   return (
     <div className="border rounded-2xl overflow-hidden flex flex-col shadow-sm">
       {/* Imagem */}
@@ -54,13 +55,22 @@ function CardQuadra({
         {/* Ações */}
         <div className="absolute top-2 right-2 flex gap-1.5">
           <button
+            onClick={onPrecificacao}
+            title="Precificação"
+            className="w-8 h-8 rounded-full bg-white border border-maingreen flex items-center justify-center shadow cursor-pointer hover:bg-maingreen/5 transition-colors"
+          >
+            <HugeiconsIcon icon={Money03Icon} size={14} className="text-maingreen" />
+          </button>
+          <button
             onClick={onEditar}
+            title="Editar"
             className="w-8 h-8 rounded-full bg-maingreen flex items-center justify-center shadow cursor-pointer hover:bg-maingreen/80 transition-colors"
           >
             <HugeiconsIcon icon={Pen01Icon} size={14} className="text-white" />
           </button>
           <button
             onClick={onExcluir}
+            title="Excluir"
             className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shadow cursor-pointer hover:bg-red-600 transition-colors"
           >
             <HugeiconsIcon icon={Delete02Icon} size={14} className="text-white" />
@@ -82,10 +92,6 @@ function CardQuadra({
             ))}
           </div>
         )}
-
-        <span className="self-start bg-maingreen/10 text-maingreen text-xs font-semibold px-2.5 py-1 rounded-full">
-          {precoFormatado}/h
-        </span>
       </div>
     </div>
   )
@@ -99,17 +105,16 @@ export function ConfiguracoesPage() {
   const { company, saving, salvarCompany } = useCompany()
   const { quadras, loading: loadingQuadras, salvarQuadra, excluirQuadra } = useConfiguracoesQuadras()
 
-  // Company — campos locais para edição inline
-  const [companyName, setCompanyName]           = useState('')
-  const [companyAddress, setCompanyAddress]     = useState('')
-  const [companyMaps, setCompanyMaps]           = useState('')
-  const [uploadingLogo, setUploadingLogo]       = useState(false)
-  const [cropSrc, setCropSrc]                   = useState<string | null>(null)
-  const [savedFeedback, setSavedFeedback]       = useState(false)
+  // Company
+  const [companyName, setCompanyName]       = useState('')
+  const [companyAddress, setCompanyAddress] = useState('')
+  const [companyMaps, setCompanyMaps]       = useState('')
+  const [uploadingLogo, setUploadingLogo]   = useState(false)
+  const [cropSrc, setCropSrc]               = useState<string | null>(null)
+  const [savedFeedback, setSavedFeedback]   = useState(false)
   const logoRef = useRef<HTMLInputElement>(null)
   const cropModal = useDisclosure()
 
-  // Sincroniza quando os dados chegam
   const [synced, setSynced] = useState(false)
   if (company && !synced) {
     setCompanyName(company.name ?? '')
@@ -123,9 +128,13 @@ export function ConfiguracoesPage() {
     companyAddress !== (company?.address ?? '') ||
     companyMaps !== (company?.google_maps_link ?? '')
 
-  // Modal quadra
+  // Modal quadra (criar/editar)
   const quadraModal = useDisclosure()
   const [quadraEditando, setQuadraEditando] = useState<QuadraCompleta | null>(null)
+
+  // Modal precificação
+  const precModal = useDisclosure()
+  const [quadraPrec, setQuadraPrec] = useState<QuadraCompleta | null>(null)
 
   // Modal exclusão
   const exclusaoModal = useDisclosure()
@@ -139,11 +148,8 @@ export function ConfiguracoesPage() {
   async function handleUploadLogo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    // Cria URL local e abre o modal de crop
-    const objectUrl = URL.createObjectURL(file)
-    setCropSrc(objectUrl)
+    setCropSrc(URL.createObjectURL(file))
     cropModal.onOpen()
-    // Limpa o input para permitir selecionar o mesmo arquivo novamente
     e.target.value = ''
   }
 
@@ -163,21 +169,6 @@ export function ConfiguracoesPage() {
       setSavedFeedback(true)
       setTimeout(() => setSavedFeedback(false), 3000)
     }
-  }
-
-  function handleAbrirEdicao(q: QuadraCompleta) {
-    setQuadraEditando(q)
-    quadraModal.onOpen()
-  }
-
-  function handleAbrirNova() {
-    setQuadraEditando(null)
-    quadraModal.onOpen()
-  }
-
-  function handleAbrirExclusao(q: QuadraCompleta) {
-    setQuadraExcluindo(q)
-    exclusaoModal.onOpen()
   }
 
   const inputBase =
@@ -215,24 +206,9 @@ export function ConfiguracoesPage() {
 
           {/* Campos company */}
           <div className="flex flex-col gap-3">
-            <input
-              className={inputBase}
-              placeholder="Nome da empresa"
-              value={companyName}
-              onChange={e => setCompanyName(e.target.value)}
-            />
-            <input
-              className={inputBase}
-              placeholder="Endereço"
-              value={companyAddress}
-              onChange={e => setCompanyAddress(e.target.value)}
-            />
-            <input
-              className={inputBase}
-              placeholder="Link Google Maps"
-              value={companyMaps}
-              onChange={e => setCompanyMaps(e.target.value)}
-            />
+            <input className={inputBase} placeholder="Nome da empresa" value={companyName} onChange={e => setCompanyName(e.target.value)} />
+            <input className={inputBase} placeholder="Endereço" value={companyAddress} onChange={e => setCompanyAddress(e.target.value)} />
+            <input className={inputBase} placeholder="Link Google Maps" value={companyMaps} onChange={e => setCompanyMaps(e.target.value)} />
 
             <button
               className="confirm-button disabled:opacity-50 disabled:cursor-not-allowed"
@@ -249,7 +225,6 @@ export function ConfiguracoesPage() {
             )}
           </div>
 
-          {/* Gerenciar Horários */}
           <button
             onClick={() => navigate('/configuracoes/horarios')}
             className="w-full border border-maingreen text-maingreen hover:bg-maingreen/5 font-semibold px-6 py-2.5 rounded-xl transition-colors cursor-pointer text-sm"
@@ -257,7 +232,6 @@ export function ConfiguracoesPage() {
             Gerenciar Horários
           </button>
 
-          {/* Logout */}
           <button
             onClick={handleLogout}
             className="w-full mt-2 border border-red-400 text-red-500 hover:bg-red-50 font-semibold px-6 py-2.5 rounded-xl transition-colors cursor-pointer text-sm"
@@ -270,7 +244,10 @@ export function ConfiguracoesPage() {
         <section className="flex-1">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-montserrat font-bold text-xl">Minhas Quadras</h2>
-            <button className="button-g" onClick={handleAbrirNova}>
+            <button
+              className="button-g"
+              onClick={() => { setQuadraEditando(null); quadraModal.onOpen() }}
+            >
               Adicionar Quadra
             </button>
           </div>
@@ -285,8 +262,9 @@ export function ConfiguracoesPage() {
                 <CardQuadra
                   key={q.id}
                   quadra={q}
-                  onEditar={() => handleAbrirEdicao(q)}
-                  onExcluir={() => handleAbrirExclusao(q)}
+                  onEditar={() => { setQuadraEditando(q); quadraModal.onOpen() }}
+                  onExcluir={() => { setQuadraExcluindo(q); exclusaoModal.onOpen() }}
+                  onPrecificacao={() => { setQuadraPrec(q); precModal.onOpen() }}
                 />
               ))}
             </div>
@@ -294,12 +272,19 @@ export function ConfiguracoesPage() {
         </section>
       </div>
 
-      {/* Modais */}
+      {/* ── Modais ── */}
       <ModalQuadra
         isOpen={quadraModal.isOpen}
         onOpenChange={quadraModal.onOpenChange}
         quadra={quadraEditando}
         onSalvar={salvarQuadra}
+      />
+
+      <ModalPrecificacao
+        isOpen={precModal.isOpen}
+        onOpenChange={precModal.onOpenChange}
+        courtId={quadraPrec?.id ?? null}
+        quadraNome={quadraPrec?.name ?? ''}
       />
 
       <ModalConfirmarExclusao
