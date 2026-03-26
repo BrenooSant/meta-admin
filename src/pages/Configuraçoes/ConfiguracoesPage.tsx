@@ -12,6 +12,8 @@ import {
   DashedLineCircleIcon,
   AlbumNotFound01Icon,
   Money03Icon,
+  Circle,
+  BadmintonShuttleIcon,
 } from '@hugeicons/core-free-icons'
 import { useCompany } from '../../hooks/company/useCompany'
 import { useConfiguracoesQuadras, type QuadraCompleta } from '../../hooks/configuracoes/useConfiguracoesQuadras'
@@ -21,6 +23,8 @@ import { ModalConfirmarExclusao } from './modals/ModalConfirmarExclusao'
 import { ModalCropImagem } from './modals/ModalCropImagem'
 
 const ICONE_ESPORTE: Record<string, any> = {
+  'Queimada': Circle,
+  'Peteca': BadmintonShuttleIcon,
   'Futvôlei': FootballIcon,
   'Beach Tennis': TennisBallIcon,
   'Vôlei': VolleyballIcon,

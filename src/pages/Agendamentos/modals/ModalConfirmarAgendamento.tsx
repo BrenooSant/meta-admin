@@ -10,6 +10,8 @@ import {
     VolleyballIcon,
     FootballIcon,
     DashedLineCircleIcon,
+    Circle,
+    BadmintonShuttleIcon,
     AlbumNotFound01Icon,
 } from "@hugeicons/core-free-icons"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react"
@@ -38,6 +40,8 @@ interface Props {
 
 function getIconeEsporte(nomeEsporte: string) {
     switch (nomeEsporte) {
+        case 'Queimada': return Circle
+        case 'Peteca': return BadmintonShuttleIcon
         case 'Futvôlei': return FootballIcon
         case 'Beach Tennis': return TennisBallIcon
         case 'Vôlei': return VolleyballIcon

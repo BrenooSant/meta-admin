@@ -9,7 +9,7 @@ import {
   SelectItem,
 } from '@heroui/react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { FootballIcon, TennisBallIcon, VolleyballIcon, DashedLineCircleIcon } from '@hugeicons/core-free-icons'
+import { FootballIcon, TennisBallIcon, VolleyballIcon, DashedLineCircleIcon, Circle, BadmintonShuttleIcon } from '@hugeicons/core-free-icons'
 
 import {
   useEditarRecurringBooking,
@@ -25,6 +25,8 @@ const HORARIOS = Array.from({ length: 24 }, (_, h) => {
 })
  
 const ICONE_ESPORTE: Record<string, any> = {
+  'Queimada': Circle,
+  'Peteca': BadmintonShuttleIcon,
   'Futvôlei': FootballIcon,
   'Beach Tennis': TennisBallIcon,
   'Vôlei': VolleyballIcon,

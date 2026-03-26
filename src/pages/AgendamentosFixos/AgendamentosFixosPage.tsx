@@ -16,6 +16,8 @@ import {
   Money03Icon,
   Calendar01Icon,
   Pen01Icon,
+  BadmintonShuttleIcon,
+  Circle,
 } from '@hugeicons/core-free-icons'
 import {
   useRecurringBookings,
@@ -37,6 +39,8 @@ const HORARIOS = Array.from({ length: 24 }, (_, h) => {
 })
 
 const ICONE_ESPORTE: Record<string, any> = {
+  'Queimada': Circle,
+  'Peteca': BadmintonShuttleIcon,
   'Futvôlei': FootballIcon,
   'Beach Tennis': TennisBallIcon,
   'Vôlei': VolleyballIcon,
