@@ -12,6 +12,8 @@ import {
   DashedLineCircleIcon,
   AlbumNotFound01Icon,
   Money03Icon,
+  Circle,
+  BadmintonShuttleIcon,
 } from '@hugeicons/core-free-icons'
 import { useCompany } from '../../hooks/company/useCompany'
 import { useConfiguracoesQuadras, type QuadraCompleta } from '../../hooks/configuracoes/useConfiguracoesQuadras'
@@ -21,6 +23,8 @@ import { ModalConfirmarExclusao } from './modals/ModalConfirmarExclusao'
 import { ModalCropImagem } from './modals/ModalCropImagem'
 
 const ICONE_ESPORTE: Record<string, any> = {
+  'Queimada': Circle,
+  'Peteca': BadmintonShuttleIcon,
   'Futvôlei': FootballIcon,
   'Beach Tennis': TennisBallIcon,
   'Vôlei': VolleyballIcon,
@@ -106,12 +110,12 @@ export function ConfiguracoesPage() {
   const { quadras, loading: loadingQuadras, salvarQuadra, excluirQuadra } = useConfiguracoesQuadras()
 
   // Company
-  const [companyName, setCompanyName]       = useState('')
+  const [companyName, setCompanyName] = useState('')
   const [companyAddress, setCompanyAddress] = useState('')
-  const [companyMaps, setCompanyMaps]       = useState('')
-  const [uploadingLogo, setUploadingLogo]   = useState(false)
-  const [cropSrc, setCropSrc]               = useState<string | null>(null)
-  const [savedFeedback, setSavedFeedback]   = useState(false)
+  const [companyMaps, setCompanyMaps] = useState('')
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [savedFeedback, setSavedFeedback] = useState(false)
   const logoRef = useRef<HTMLInputElement>(null)
   const cropModal = useDisclosure()
 
@@ -230,6 +234,13 @@ export function ConfiguracoesPage() {
             className="w-full border border-maingreen text-maingreen hover:bg-maingreen/5 font-semibold px-6 py-2.5 rounded-xl transition-colors cursor-pointer text-sm"
           >
             Gerenciar Horários
+          </button>
+
+          <button
+            onClick={() => navigate('/configuracoes/agendamentos-fixos')}
+            className="w-full border border-maingreen text-maingreen hover:bg-maingreen/5 font-semibold px-6 py-2.5 rounded-xl transition-colors cursor-pointer text-sm"
+          >
+            Agendamentos Fixos
           </button>
 
           <button

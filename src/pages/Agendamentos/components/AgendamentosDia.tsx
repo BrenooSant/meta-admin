@@ -11,6 +11,8 @@ import {
     TennisBallIcon,
     FootballIcon,
     VolleyballIcon,
+    BadmintonShuttleIcon,
+    Circle,
     DashedLineCircleIcon,
 } from "@hugeicons/core-free-icons"
 import { useDisclosure } from "@heroui/react"
@@ -38,6 +40,8 @@ const TURNOS: { turno: Turno; label: string; icon: any; className: string }[] = 
 
 function getIconeEsporte(nomeEsporte: string) {
     switch (nomeEsporte) {
+        case 'Queimada': return Circle
+        case 'Peteca': return BadmintonShuttleIcon
         case 'Futvôlei': return FootballIcon
         case 'Beach Tennis': return TennisBallIcon
         case 'Vôlei': return VolleyballIcon

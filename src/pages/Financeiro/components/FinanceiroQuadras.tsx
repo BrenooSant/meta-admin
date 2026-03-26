@@ -20,6 +20,8 @@ const SPORT_COLORS: Record<string, string> = {
   "Beach Tennis": "#3B82F6",
   "Vôlei": "#EF4444",
   "Futvôlei": "#22C55E",
+  "Peteca": "#8907AE",
+  "Queimada": "#F600DD",
 };
 const BRL = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 const semanaLabels: Record<number, string> = { 1: "1-7", 2: "8-14", 3: "15-21", 4: "22-28", 5: "29-31" };

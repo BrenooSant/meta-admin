@@ -104,21 +104,39 @@ export function useHorariosDisponiveis(
       const inicioDia = `${ano}-${mes}-${dia}T00:00:00`;
       const fimDia = `${ano}-${mes}-${dia}T23:59:59`;
 
-      const { data: bookingsExistentes } = await supabase
-        .from("bookings")
-        .select("booking_start, booking_end")
-        .in("court_sport_id", todosIds)
-        .gte("booking_start", inicioDia)
-        .lte("booking_start", fimDia);
+      // Busca agendamentos avulsos e recorrentes em paralelo
+      const [{ data: bookingsExistentes }, { data: recorrentesExistentes }] =
+        await Promise.all([
+          supabase
+            .from("bookings")
+            .select("booking_start, booking_end")
+            .in("court_sport_id", todosIds)
+            .gte("booking_start", inicioDia)
+            .lte("booking_start", fimDia),
+          supabase
+            .from("recurring_bookings")
+            .select("start_time, end_time")
+            .in("court_sport_id", todosIds)
+            .eq("day_of_week", diaSemana)
+            .lte("valid_from", dataISO)
+            .or(`valid_until.is.null,valid_until.gte.${dataISO}`),
+        ]);
 
-      const bookedIntervals = (bookingsExistentes ?? []).map((b: any) => {
-        const start = new Date(b.booking_start);
-        const end = new Date(b.booking_end);
-        return {
-          startMin: start.getHours() * 60 + start.getMinutes(),
-          endMin: end.getHours() * 60 + end.getMinutes(),
-        };
-      });
+      const bookedIntervals: { startMin: number; endMin: number }[] = [
+        ...(bookingsExistentes ?? []).map((b: any) => {
+          const start = new Date(b.booking_start);
+          const end = new Date(b.booking_end);
+          return {
+            startMin: start.getHours() * 60 + start.getMinutes(),
+            endMin: end.getHours() * 60 + end.getMinutes(),
+          };
+        }),
+        ...(recorrentesExistentes ?? []).map((r: any) => {
+          const [sh, sm] = r.start_time.split(":").map(Number);
+          const [eh, em] = r.end_time.split(":").map(Number);
+          return { startMin: sh * 60 + sm, endMin: eh * 60 + em };
+        }),
+      ];
 
       function isOcupado(slotStartMin: number, durationMin: number): boolean {
         const slotEnd = slotStartMin + durationMin;

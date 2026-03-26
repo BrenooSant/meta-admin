@@ -2,11 +2,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { LoginPage } from "../pages/Login/LoginPage";
 import { AgendamentosPage } from "../pages/Agendamentos/AgendamentosPage";
+import { EventosPage } from "../pages/Eventos/EventosPage";
 import { AcademiaPage } from "../pages/Academia/AcademiaPage";
 import { FinanceiroPage } from "../pages/Financeiro/FinanceiroPage";
 import { ConfiguracoesPage } from "../pages/Configuraçoes/ConfiguracoesPage";
 import { ComprovantePage } from "../pages/Comprovante/ComprovantePage"
 import { GerenciarHorariosPage } from "../pages/GerenciarHorarios/GerenciarHorariosPage";
+import { AgendamentosFixosPage } from "../pages/AgendamentosFixos/AgendamentosFixosPage";
 import { MainLayout } from "../layouts/MainLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthRedirect } from "./components/AuthRedirect";
@@ -20,10 +22,12 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/agendamentos" element={<AgendamentosPage />} />
+            <Route path="/eventos" element={<EventosPage />} />
             <Route path="/academia" element={<AcademiaPage />} />
             <Route path="/financeiro" element={<FinanceiroPage />} />
             <Route path="/configuracoes" element={<ConfiguracoesPage />} />
             <Route path="/configuracoes/horarios" element={<GerenciarHorariosPage />} />
+            <Route path="/configuracoes/agendamentos-fixos" element={<AgendamentosFixosPage />} />
           </Route>
         </Route>
 
