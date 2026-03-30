@@ -6,7 +6,12 @@ export interface EsporteDaQuadra {
   sport_name: string
 }
 
-export function useEsportesPorQuadra(courtId: string | null) {
+interface Options {
+  excluirEsportes?: string[]
+}
+
+export function useEsportesPorQuadra(courtId: string | null, options: Options = {}) {
+  const { excluirEsportes = [] } = options
   const [esportes, setEsportes] = useState<EsporteDaQuadra[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -22,15 +27,19 @@ export function useEsportesPorQuadra(courtId: string | null) {
       .select('id, sports(name)')
       .eq('court_id', courtId)
       .then(({ data }) => {
-        setEsportes(
-          (data ?? []).map((item: any) => ({
-            court_sport_id: item.id,
-            sport_name: item.sports?.name ?? '—',
-          }))
-        )
+        const todos: EsporteDaQuadra[] = (data ?? []).map((item: any) => ({
+          court_sport_id: item.id,
+          sport_name: item.sports?.name ?? '—',
+        }))
+
+        const filtrados = excluirEsportes.length > 0
+          ? todos.filter(e => !excluirEsportes.includes(e.sport_name))
+          : todos
+
+        setEsportes(filtrados)
         setLoading(false)
       })
-  }, [courtId])
+  }, [courtId, JSON.stringify(excluirEsportes)])
 
   return { esportes, loading }
 }

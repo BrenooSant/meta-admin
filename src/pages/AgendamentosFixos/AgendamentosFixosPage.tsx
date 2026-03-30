@@ -17,6 +17,7 @@ import {
   Calendar01Icon,
   Pen01Icon,
   BadmintonShuttleIcon,
+  WorkoutStretchingIcon,
   Circle,
 } from '@hugeicons/core-free-icons'
 import {
@@ -39,6 +40,7 @@ const HORARIOS = Array.from({ length: 24 }, (_, h) => {
 })
 
 const ICONE_ESPORTE: Record<string, any> = {
+  'Funcional na areia': WorkoutStretchingIcon,
   'Queimada': Circle,
   'Peteca': BadmintonShuttleIcon,
   'Futvôlei': FootballIcon,

@@ -14,6 +14,7 @@ import {
   Money03Icon,
   Circle,
   BadmintonShuttleIcon,
+  WorkoutStretchingIcon,
 } from '@hugeicons/core-free-icons'
 import { useCompany } from '../../hooks/company/useCompany'
 import { useConfiguracoesQuadras, type QuadraCompleta } from '../../hooks/configuracoes/useConfiguracoesQuadras'
@@ -23,6 +24,7 @@ import { ModalConfirmarExclusao } from './modals/ModalConfirmarExclusao'
 import { ModalCropImagem } from './modals/ModalCropImagem'
 
 const ICONE_ESPORTE: Record<string, any> = {
+  'Funcional na areia': WorkoutStretchingIcon,
   'Queimada': Circle,
   'Peteca': BadmintonShuttleIcon,
   'Futvôlei': FootballIcon,

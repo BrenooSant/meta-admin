@@ -46,7 +46,9 @@ export function ModalNovoAgendamento({ isOpen, onOpenChange, onSuccess }: Props)
   const [dadosConfirmacao, setDadosConfirmacao] = useState<DadosConfirmacao | null>(null)
 
   const { quadras } = useQuadras()
-  const { esportes } = useEsportesPorQuadra(quadraId)
+  const { esportes } = useEsportesPorQuadra(quadraId, {
+    excluirEsportes: ['Funcional na areia'],
+  })
   const { horarios } = useHorariosDisponiveis(courtSportId, dataSelecionada)
 
   const quadraSelecionada = quadras.find(q => q.id === quadraId)
